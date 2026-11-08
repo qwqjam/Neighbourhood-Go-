@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neighbourhood Go! 鄰里 Go!</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            creamBg: '#FBF8EE',
+            cardBg: '#FFFDF5',
+            softGreen: '#8FA963',
+            darkGreen: '#5C7A2D',
+            accentOrange: '#E98A3D',
+            lightGreen: '#E2ECC8',
+            fogDark: 'rgba(15, 23, 18, 0.94)'
+          },
+          fontFamily: {
+            sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'PingFang TC', 'Microsoft JhengHei', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #dce7ca;
+      background-image: radial-gradient(#8fa963 0.8px, #e3ebd2 0.8px);
+      background-size: 16px 16px;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .phone-container {
+      width: 390px;
+      height: 780px;
+      background-color: #FBF8EE;
+      border-radius: 38px;
+      overflow: hidden;
+      box-shadow: 0 16px 38px rgba(60, 80, 35, 0.22);
+      border: 8px solid #ffffff;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    @media (max-width: 420px) {
+      .phone-container {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+        border: none;
+      }
+    }
+    .page {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 90px; /* SCROLL FIX: Ensure bottom content is never obscured */
+    }
+    .page.active {
+      display: flex;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Keyframe Animations */
+    @keyframes pulseGlow {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(233, 138, 61, 0.85); }
+      70% { transform: scale(1.08); box-shadow: 0 0 0 22px rgba(233, 138, 61, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(233, 138, 61, 0); }
+    }
+    .pulse-glow { animation: pulseGlow 2s infinite; }
+
+    @keyframes fogDissolve {
+      0% { opacity: 0.95; filter: blur(8px); }
+      100% { opacity: 0; filter: blur(0px); visibility: hidden; }
+    }
+    .fog-clearing { animation: fogDissolve 1.6s forwards ease-out; }
+
+    @keyframes badgePop {
+      0% { transform: scale(0.3) rotate(-15deg); opacity: 0; }
+      70% { transform: scale(1.12) rotate(5deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+    .badge-pop { animation: badgePop 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+    @keyframes dashWalk {
+      0% { strokeDashoffset: 24; }
+      100% { strokeDashoffset: 0; }
+    }
+    .animate-dash-walk { animation: dashWalk 1.5s linear infinite; }
+  </style>
+</head>
+<body class="min-h-screen flex justify-center items-center p-0 sm:p-2">
+
+  <!-- Mobile Phone Frame Container -->
+  <div class="phone-container">
+
+    <!-- ========== SCREEN 1: HOME (首頁) ========== -->
+    <div id="page-home" class="page active">
+      <div class="p-4 flex flex-col gap-3 flex-1 overflow-y-auto no-scrollbar">
+        
+        <!-- Clean Header: Avatar + Tokens + Bilingual Switcher -->
+        <header class="flex justify-between items-center bg-cardBg p-3 rounded-2xl border border-[#E2ECC8] shadow-sm">
+          <div class="flex items-center gap-3">
+            <div onclick="switchPage('page-profile')" class="relative flex items-center justify-center cursor-pointer">
+              <div class="w-12 h-12 rounded-full bg-lightGreen border-2 border-darkGreen flex items-center justify-center text-2xl shadow-xs overflow-hidden">
+                👦
+              </div>
+              <span class="absolute -bottom-1 -right-1 bg-amber-400 text-amber-950 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full border border-white shadow-xs">
+                Lv.6
+              </span>
+            </div>
+            <div>
+              <h2 class="font-extrabold text-gray-800 text-base flex items-center gap-1.5 leading-snug">
+                <span class="lang-zh">小林</span><span class="lang-en hidden">Xiao Lin</span>
+                <span id="home-equipped-title-tag" class="text-[10px] bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded-md border border-amber-300 font-bold">
+                  <span class="lang-zh">【日落大使】</span><span class="lang-en hidden">[Sunset Ambassador]</span>
+                </span>
+              </h2>
+              <p class="text-xs text-gray-500 font-medium flex items-center gap-1">
+                <span>🐾 <span class="lang-zh">夥伴:</span><span class="lang-en hidden">Buddy:</span></span>
+                <strong id="home-buddy-name" class="text-darkGreen">西環巷仔貓 🐈</strong>
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="bg-lightGreen/80 px-2.5 py-1 rounded-xl text-xs font-bold text-darkGreen flex items-center gap-1 shadow-xs">
+              <span>🪙</span> <span class="global-tokens-display">260</span>
+            </div>
+            <button onclick="toggleLanguage()" class="px-2.5 py-1 bg-white border border-gray-300 rounded-lg text-xs font-bold text-gray-700 hover:bg-gray-50 transition shadow-xs">
+              <span id="lang-btn-text">EN</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Live Weather Bonus Banner -->
+        <div class="bg-amber-50 border border-amber-200 p-2.5 rounded-xl flex justify-between items-center text-xs shadow-xs">
+          <div class="flex items-center gap-2 text-amber-900">
+            <span class="text-base">☀️</span>
+            <span class="font-semibold">
+              <span class="lang-zh">堅尼地城 26°C · 晴朗宜漫步</span>
+              <span class="lang-en hidden">Kennedy Town 26°C · Sunny Walk</span>
+            </span>
+          </div>
+          <span class="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-extrabold">
+            <span class="lang-zh">探索加成 +10%</span>
+            <span class="lang-en hidden">Bonus +10%</span>
+          </span>
+        </div>
+
+        <!-- Unlocked Badges Showcase Carousel -->
+        <div>
+          <div class="flex justify-between items-center mb-1.5 px-1">
+            <span class="text-xs font-bold text-gray-700 flex items-center gap-1">
+              <i class="fa-solid fa-award text-darkGreen"></i>
+              <span class="lang-zh">已收集成就勳章</span><span class="lang-en hidden">Unlocked Badges</span>
+            </span>
+            <button onclick="openAllBadgesModal()" class="text-[11px] text-darkGreen font-extrabold hover:underline">
+              <span class="lang-zh">查看全部 12 個 →</span><span class="lang-en hidden">View All 12 →</span>
+            </button>
+          </div>
+          
+          <div class="grid grid-cols-4 gap-1.5">
+            <div onclick="openAllBadgesModal()" class="bg-cardBg p-1.5 rounded-xl border border-lightGreen text-center flex flex-col items-center shadow-xs cursor-pointer hover:border-softGreen">
+              <svg width="34" height="34" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="42" fill="#FEF08A" stroke="#E98A3D" stroke-width="4"/>
+                <path d="M50 20 L58 38 L78 38 L62 50 L68 70 L50 58 L32 70 L38 50 L22 38 L42 38 Z" fill="#E98A3D"/>
+              </svg>
+              <p class="text-[10px] font-bold text-gray-800 mt-1 truncate w-full">
+                <span class="lang-zh">首次打卡</span><span class="lang-en hidden">First Check</span>
+              </p>
+            </div>
+
+            <div onclick="openAllBadgesModal()" class="bg-cardBg p-1.5 rounded-xl border border-lightGreen text-center flex flex-col items-center shadow-xs cursor-pointer hover:border-softGreen">
+              <svg width="34" height="34" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="44" fill="#FFFDF5" stroke="#E98A3D" stroke-width="4"/>
+                <path d="M25 65 C 15 45, 25 25, 48 20" fill="none" stroke="#5C7A2D" stroke-width="4" stroke-linecap="round"/>
+                <path d="M75 65 C 85 45, 75 25, 52 20" fill="none" stroke="#5C7A2D" stroke-width="4" stroke-linecap="round"/>
+                <rect x="36" y="42" width="28" height="22" rx="2" fill="#8FA963" />
+                <polygon points="34,42 50,30 66,42" fill="#E98A3D" />
+              </svg>
+              <p class="text-[10px] font-bold text-gray-800 mt-1 truncate w-full">
+                <span class="lang-zh">古蹟達人</span><span class="lang-en hidden">Heritage</span>
+              </p>
+            </div>
+
+            <div onclick="openAllBadgesModal()" class="bg-cardBg p-1.5 rounded-xl border border-lightGreen text-center flex flex-col items-center shadow-xs cursor-pointer hover:border-softGreen">
+              <svg width="34" height="34" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="42" fill="#FFEDD5" stroke="#F97316" stroke-width="4"/>
+                <circle cx="50" cy="42" r="18" fill="#F97316"/>
+                <path d="M20 65 Q 50 55, 80 65 Q 50 75, 20 65 Z" fill="#38BDF8"/>
+              </svg>
+              <p class="text-[10px] font-bold text-gray-800 mt-1 truncate w-full">
+                <span class="lang-zh">西環落日</span><span class="lang-en hidden">Sunset</span>
+              </p>
+            </div>
+
+            <div onclick="openAllBadgesModal()" class="bg-cardBg p-1.5 rounded-xl border border-lightGreen text-center flex flex-col items-center shadow-xs cursor-pointer hover:border-softGreen">
+              <svg width="34" height="34" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="42" fill="#E0F2FE" stroke="#0284C7" stroke-width="4"/>
+                <path d="M30 70 L30 40 L50 25 L70 40 L70 70 Z" fill="#F59E0B" stroke="#B45309" stroke-width="3"/>
+                <rect x="42" y="50" width="16" height="20" fill="#78350F"/>
+              </svg>
+              <p class="text-[10px] font-bold text-gray-800 mt-1 truncate w-full">
+                <span class="lang-zh">舊街探索</span><span class="lang-en hidden">Old Street</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Today's Random Target Location Card -->
+        <div class="bg-cardBg rounded-2xl p-3 border-2 border-softGreen shadow-sm mt-1">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-extrabold text-darkGreen bg-lightGreen px-2.5 py-0.5 rounded-lg flex items-center gap-1">
+              🎯 <span class="lang-zh">今日隨機推薦地點</span><span class="lang-en hidden">Today's Target Location</span>
+            </span>
+            <button onclick="randomizeLocation()" class="text-[11px] text-gray-600 hover:text-darkGreen font-bold flex items-center gap-1 bg-white px-2 py-0.5 rounded-lg border border-gray-200 shadow-xs">
+              🎲 <span class="lang-zh">隨機抽換</span><span class="lang-en hidden">Re-spin</span>
+            </button>
+          </div>
+
+          <div class="relative h-40 rounded-xl overflow-hidden border border-gray-200 mb-3">
+            <img id="target-image" src="https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600" class="w-full h-full object-cover" alt="Landmark">
+            <div class="absolute top-2 left-2 bg-black/65 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+              📍 <span id="target-district">西營盤</span>
+            </div>
+          </div>
+
+          <h3 id="target-title" class="font-bold text-base text-gray-800 mb-1 leading-snug">高街社區綜合大樓 (舊建築)</h3>
+          <p id="target-desc" class="text-xs text-gray-600 line-clamp-2 mb-3 leading-relaxed">
+            二級歷史建築，花崗石拱廊極具維多利亞時代古典風格，漫步期間如同穿越時空。
+          </p>
+
+          <button onclick="switchPage('page-detail')" class="w-full py-3 bg-softGreen hover:bg-darkGreen text-white font-bold text-sm rounded-xl shadow-md transition-all flex justify-center items-center gap-2 border border-white/40">
+            🚀 <span class="lang-zh">開始探索這個地點</span><span class="lang-en hidden">Start Exploring Location</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========== SCREEN 2: LOCATION DETAIL (地點詳情頁) ========== -->
+    <div id="page-detail" class="page">
+      <div class="p-4 flex flex-col gap-3 flex-1 overflow-y-auto no-scrollbar">
+        
+        <!-- Top Navigation -->
+        <div class="flex items-center justify-between">
+          <button onclick="switchPage('page-home')" class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-700 shadow-xs">
+            <i class="fa fa-arrow-left"></i>
+          </button>
+          <h2 id="detail-header-title" class="font-bold text-gray-800 text-sm truncate max-w-[200px]">高街社區綜合大樓 (舊建築)</h2>
+          <button onclick="randomizeLocation()" class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-darkGreen shadow-xs">
+            <i class="fa fa-refresh"></i>
+          </button>
+        </div>
+
+        <!-- Main Hero Card -->
+        <div class="bg-cardBg rounded-2xl p-3 border border-lightGreen shadow-sm space-y-2.5">
+          <div class="relative h-44 rounded-xl overflow-hidden border border-gray-200">
+            <img id="detail-image" src="https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600" class="w-full h-full object-cover" alt="Hero">
+            <div class="absolute top-2 right-2 bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs">
+              ☀️ <span class="lang-zh">晴朗適宜散步</span><span class="lang-en hidden">Sunny & Pleasant</span>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center text-xs text-gray-600 pb-1.5 border-b border-gray-100">
+            <span>🏷️ <span class="lang-zh">興趣:</span><span class="lang-en hidden">Tags:</span> <strong id="detail-tags" class="text-gray-800">古典、建築、古蹟</strong></span>
+            <span class="text-[11px] bg-lightGreen text-darkGreen px-2.5 py-0.5 rounded-full font-bold">
+              <span class="lang-zh">最近打卡:</span> <span id="detail-checkin-count">15</span><span class="lang-zh">人</span><span class="lang-en hidden"> checked-in</span>
+            </span>
+          </div>
+
+          <p id="detail-full-desc" class="text-xs text-gray-700 leading-relaxed">
+            二級歷史建築，花崗石拱廊極具維多利亞時代古典風格，漫步期間如同穿越時空。
+          </p>
+
+          <div class="bg-amber-50/90 p-2.5 rounded-xl border border-amber-200 flex justify-between items-center">
+            <span class="text-xs font-bold text-gray-700">
+              <span class="lang-zh">完成任務可獲得</span><span class="lang-en hidden">Reward Tokens</span>
+            </span>
+            <span id="detail-reward-text" class="text-lg font-black text-darkGreen">+45 Token</span>
+          </div>
+
+          <!-- Companion Mode Selector -->
+          <div>
+            <p class="text-[11px] font-bold text-gray-600 mb-1.5">
+              <span class="lang-zh">選擇探索模式 (結伴同行獎勵加成):</span>
+              <span class="lang-en hidden">Select Mode (Companion Bonus):</span>
+            </p>
+            <div class="grid grid-cols-2 gap-2">
+              <button id="mode-solo" onclick="selectMode('solo')" class="py-2 px-3 rounded-xl border-2 border-softGreen bg-lightGreen text-darkGreen text-xs font-bold flex items-center justify-center gap-1 transition-all">
+                👤 <span class="lang-zh">適合獨自前來 (1.0x)</span><span class="lang-en hidden">Solo Walk (1.0x)</span>
+              </button>
+              <button id="mode-duo" onclick="selectMode('duo')" class="py-2 px-3 rounded-xl border border-gray-200 bg-white text-gray-600 text-xs font-bold flex items-center justify-center gap-1 transition-all">
+                👥 <span class="lang-zh">適合結伴 (1.5x)</span><span class="lang-en hidden">With Squad (1.5x)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Merged Check-in Actions -->
+          <button onclick="triggerCheckin()" class="w-full py-3 bg-softGreen hover:bg-darkGreen text-white font-bold text-sm rounded-xl shadow-md transition-all flex justify-center items-center gap-2 border border-white/40">
+            📍 <span class="lang-zh">現場打卡</span><span class="lang-en hidden">On-site Check-in</span>
+          </button>
+        </div>
+
+        <!-- Navigation Route Map Section -->
+        <div class="bg-cardBg rounded-2xl p-3 border border-lightGreen shadow-sm space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold text-gray-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-route text-amber-600"></i>
+              <span class="lang-zh">實時路線規劃探索</span><span class="lang-en hidden">Live Route Navigation</span>
+            </span>
+            <span class="text-[10px] bg-amber-100 text-amber-900 border border-amber-200 px-2 py-0.5 rounded-full font-bold">
+              🚶 <span class="lang-zh">預計 450m · 步行 6 分鐘</span><span class="lang-en hidden">Est. 450m · 6 min</span>
+            </span>
+          </div>
+
+          <div class="relative h-32 rounded-xl bg-[#e3ebd2] border border-gray-200 overflow-hidden flex items-center justify-center">
+            <svg class="absolute inset-0 w-full h-full" viewBox="0 0 300 120">
+              <path d="M 30 95 L 110 95 L 160 30 L 270 30" fill="none" stroke="#FFFDF5" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M 30 95 L 110 95 L 160 30 L 270 30" fill="none" stroke="#CBD5E1" stroke-width="2" stroke-dasharray="4 4" stroke-linecap="round"/>
+              <path d="M 30 95 L 110 95 L 160 30 L 270 30" fill="none" stroke="#EF4444" stroke-width="3.5" stroke-dasharray="6 6" class="animate-dash-walk" stroke-linecap="round"/>
+              
+              <circle cx="30" cy="95" r="7" fill="#2563EB" stroke="#FFFFFF" stroke-width="2"/>
+              <text x="5" y="115" fill="#1E40AF" font-size="9" font-weight="bold">
+                <tspan class="lang-zh">你的位置</tspan><tspan class="lang-en hidden">You</tspan>
+              </text>
+              
+              <g transform="translate(265, 12)">
+                <path d="M10 0 C4 0 0 4 0 10 C0 18 10 26 10 26 C10 26 20 18 20 10 C20 4 16 0 10 0 Z" fill="#EF4444"/>
+                <circle cx="10" cy="9" r="3" fill="#FFFFFF"/>
+              </g>
+            </svg>
+            <div class="absolute bottom-2 left-2 right-2 bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded-lg text-[10px] text-gray-700 border border-gray-200 flex justify-between items-center shadow-xs">
+              <span>📍 <span class="lang-zh" id="route-instruction-zh">沿高街直行 200 米 ➔ 正街轉左</span><span class="lang-en hidden" id="route-instruction-en">Walk 200m down High St ➔ Turn left on Centre St</span></span>
+              <span class="text-darkGreen font-bold"><span class="lang-zh">即將抵達</span><span class="lang-en hidden">Arriving Soon</span></span>
+            </div>
+          </div>
+
+          <button onclick="triggerCheckin()" class="w-full py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-1.5">
+            🎯 <span class="lang-zh">模擬 GPS 抵達並打卡 (Prototype Test)</span><span class="lang-en hidden">Simulate GPS Arrival (Prototype Test)</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========== CELEBRATION MODAL (解鎖慶祝彈窗) ========== -->
+    <div id="modal-celebration" class="absolute inset-0 bg-black/60 backdrop-blur-xs z-30 hidden flex justify-center items-center p-4">
+      <div class="bg-cardBg border-4 border-amber-300 rounded-3xl p-5 text-center shadow-2xl w-full max-w-xs badge-pop relative overflow-hidden">
+        
+        <div class="text-4xl mb-1">🎉</div>
+        <h3 class="font-black text-lg text-gray-800">
+          <span class="lang-zh">地標解鎖成功！</span><span class="lang-en hidden">Landmark Unlocked!</span>
+        </h3>
+        <p id="unlocked-landmark-name" class="text-xs text-darkGreen font-bold mb-2">高街社區綜合大樓 (舊建築)</p>
+
+        <div id="modal-badge-container" class="w-24 h-24 mx-auto my-1 relative flex items-center justify-center">
+          <!-- Injected via JS -->
+        </div>
+
+        <div class="bg-amber-100/90 rounded-2xl p-2.5 my-2.5 border border-amber-200">
+          <p class="text-[11px] text-amber-900 font-bold">
+            <span class="lang-zh">獲得探索獎勵</span><span class="lang-en hidden">Reward Claimed</span>
+          </p>
+          <p id="modal-token-amount" class="text-xl font-black text-accentOrange">+45 Token</p>
+        </div>
+
+        <p id="modal-badge-title" class="text-[11px] text-gray-600 mb-3 font-medium">
+          <span class="lang-zh">榮獲勳章：「古蹟達人」</span>
+          <span class="lang-en hidden">Badge Unlocked: "Historic Explorer"</span>
+        </p>
+
+        <button onclick="goToFogUnlockPage(true)" class="w-full py-3 bg-darkGreen hover:bg-softGreen text-white font-bold text-xs rounded-xl shadow-md transition-all">
+          <span class="lang-zh">✨ 觀看地區迷霧解鎖動畫 →</span>
+          <span class="lang-en hidden">✨ Watch District Fog Unlock →</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ========== SCREEN 3: RPG FOG UNLOCK & 1970s VR (地圖迷霧與 VR) ========== -->
+    <div id="page-fog-unlock" class="page">
+      <div class="p-4 flex flex-col gap-3 flex-1 overflow-y-auto no-scrollbar relative">
+        
+        <header class="text-center my-1">
+          <h2 class="font-extrabold text-lg text-gray-800 flex items-center justify-center gap-1.5">
+            🗺️ <span class="lang-zh">社區地圖與 VR 探索</span><span class="lang-en hidden">Community Map & VR</span>
+          </h2>
+          <p class="text-xs text-gray-500 font-medium">
+            <span class="lang-zh">預覽西區迷霧區塊與 1970 復古街景</span>
+            <span class="lang-en hidden">Explore unlocked zones & 1970s Old HK VR</span>
+          </p>
+        </header>
+
+        <!-- Mode Toggle -->
+        <div class="bg-white p-1 rounded-xl border border-gray-200 flex text-xs font-bold shadow-xs">
+          <button id="map-mode-btn-standard" onclick="switchMapMode('standard')" class="flex-1 py-1.5 rounded-lg bg-softGreen text-white transition-all text-center">
+            🗺️ <span class="lang-zh">社區地圖</span><span class="lang-en hidden">Map View</span>
+          </button>
+          <button id="map-mode-btn-vr" onclick="switchMapMode('vr')" class="flex-1 py-1.5 rounded-lg text-gray-600 hover:text-darkGreen transition-all text-center">
+            👓 <span class="lang-zh">1970 舊香港 VR</span><span class="lang-en hidden">1970s VR Old HK</span>
+          </button>
+        </div>
+
+        <!-- Dynamic Rolling Progress Bar -->
+        <div class="bg-cardBg p-3 rounded-2xl border border-lightGreen shadow-sm">
+          <div class="flex justify-between items-center text-xs font-bold mb-1">
+            <span class="text-darkGreen">
+              <span class="lang-zh">西區社區探索度</span><span class="lang-en hidden">Western District Progress</span>
+            </span>
+            <span id="progress-text" class="text-accentOrange text-sm font-black">42%</span>
+          </div>
+          <div class="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+            <div id="progress-bar" class="h-full bg-accentOrange transition-all duration-1000" style="width: 42%;"></div>
+          </div>
+        </div>
+
+        <!-- STANDARD MAP VIEW CONTAINER -->
+        <div id="map-view-standard" class="relative h-80 rounded-2xl overflow-hidden border-2 border-darkGreen shadow-md bg-[#1d3d4b]">
+          <svg class="absolute inset-0 w-full h-full" viewBox="0 0 350 280">
+            <rect width="350" height="280" fill="#1b3b48"/>
+            <path d="M0 80 Q90 120, 180 90 T350 140 L350 280 L0 280 Z" fill="#325e4c"/>
+            <path d="M30 110 Q120 140, 200 120 T350 280 L350 280 L30 280 Z" fill="#44735b"/>
+            <path d="M0 80 Q90 120, 180 90 T350 140" fill="none" stroke="#7eb89d" stroke-width="2"/>
+
+            <path d="M40 180 L180 140 L290 200 M110 240 L180 140 M180 140 L220 110" fill="none" stroke="#e3e0bb" stroke-width="2.5" stroke-dasharray="2 2"/>
+
+            <g transform="translate(80, 160)">
+              <circle cx="0" cy="0" r="10" fill="#38bdf8" stroke="#ffffff" stroke-width="2"/>
+              <polygon points="0,-6 4,4 -4,4" fill="#ffffff"/>
+            </g>
+
+            <g transform="translate(180, 140)">
+              <circle cx="0" cy="0" r="14" fill="#E98A3D" stroke="#ffffff" stroke-width="2" class="pulse-glow"/>
+              <polygon points="0,-8 6,6 -6,6" fill="#ffffff"/>
+            </g>
+          </svg>
+
+          <!-- RPG Fog of War Overlay -->
+          <div id="fog-overlay" class="absolute inset-0 bg-fogDark z-20 hidden flex justify-center items-center transition-all cursor-pointer" onclick="clearFog()">
+            <div class="text-center text-white px-4">
+              <span class="text-4xl animate-bounce inline-block mb-1">✨</span>
+              <p class="text-xs font-bold">
+                <span class="lang-zh">任務完成！點擊解鎖地區神秘迷霧！</span>
+                <span class="lang-en hidden">Mission Done! Tap to reveal dark fog!</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1970s VR OLD HK PREVIEW CONTAINER -->
+        <div id="map-view-vr" class="relative h-80 rounded-2xl overflow-hidden border-2 border-amber-600 shadow-md hidden bg-amber-950">
+          <img src="https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=800" class="w-full h-full object-cover filter sepia contrast-125 brightness-90" alt="1970s VR Street">
+          <div class="absolute inset-0 bg-amber-900/30 backdrop-sepia-50 pointer-events-none"></div>
+
+          <div class="absolute top-2 left-2 bg-amber-900/80 backdrop-blur-xs text-amber-200 border border-amber-500/50 text-[10px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-xs">
+            <span>👓 360° 1970s Old Hong Kong VR</span>
+          </div>
+
+          <div class="absolute bottom-4 left-6 bg-amber-100 text-amber-900 px-3 py-1.5 rounded-xl border border-amber-400 text-xs font-bold shadow-lg flex items-center gap-2">
+            <span>🚃 叮叮車復古老街景 (1976)</span>
+          </div>
+        </div>
+
+        <button onclick="switchPage('page-memories')" class="w-full py-3 bg-softGreen hover:bg-darkGreen text-white font-bold text-xs rounded-xl shadow-md transition-all mt-1">
+          <span class="lang-zh">查看社區記憶與寫下感想 →</span>
+          <span class="lang-en hidden">View Community Memories & Share Story →</span>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- ========== SCREEN 4: COMMUNITY MEMORIES (社區記憶牆) ========== -->
+    <div id="page-memories" class="page">
+      <div class="p-4 flex flex-col gap-3 flex-1 overflow-y-auto no-scrollbar">
+        
+        <div class="flex items-center justify-between">
+          <button onclick="switchPage('page-detail')" class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-700 shadow-xs">
+            <i class="fa fa-arrow-left"></i>
+          </button>
+          <h2 class="font-bold text-gray-800 text-sm">
+            <span class="lang-zh">社區記憶與舊街故事</span><span class="lang-en hidden">Community Memories</span>
+          </h2>
+          <div class="w-8"></div>
+        </div>
+
+        <!-- Submit Memory Form -->
+        <div class="bg-cardBg p-3 rounded-2xl border border-lightGreen shadow-sm space-y-2">
+          <h3 class="font-bold text-xs text-darkGreen flex items-center gap-1">
+            ✏️ <span class="lang-zh">留下你對這個地方的感想與照片</span>
+            <span class="lang-en hidden">Share your thoughts & attach photo</span>
+          </h3>
+          <textarea id="memory-input" class="w-full p-2.5 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-softGreen text-gray-700 resize-none" rows="2" placeholder="寫下你的感想（例如：童年時常跟奶奶來這裡散步...）"></textarea>
+          
+          <div class="flex justify-between items-center pt-1 border-t border-gray-100">
+            <div class="flex items-center gap-2">
+              <label class="cursor-pointer bg-lightGreen/70 text-darkGreen text-[11px] px-2.5 py-1 rounded-lg border border-lightGreen font-extrabold flex items-center gap-1 hover:bg-lightGreen">
+                📷 <span class="lang-zh">附上照片</span><span class="lang-en hidden">Attach Photo</span>
+                <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
+              </label>
+              <span id="image-attached-label" class="text-[10px] text-gray-500 font-semibold hidden">
+                <span class="lang-zh">已選擇照片</span><span class="lang-en hidden">Photo Attached</span>
+              </span>
+            </div>
+
+            <button onclick="submitMemory()" class="px-4 py-1.5 bg-darkGreen text-white text-xs font-bold rounded-lg hover:bg-softGreen transition-all shadow-xs">
+              <span class="lang-zh">發佈感想</span><span class="lang-en hidden">Post</span>
+            </button>
+          </div>
+
+          <div id="image-preview-container" class="hidden pt-1">
+            <img id="image-preview" src="" class="h-20 rounded-lg border border-gray-200 object-cover" alt="Preview">
+          </div>
+        </div>
+
+        <!-- Memories Feed List -->
+        <div id="memories-list" class="flex flex-col gap-2.5">
+          <div class="bg-cardBg p-3 rounded-2xl border border-gray-100 shadow-sm">
+            <div class="flex justify-between items-center mb-1.5">
+              <div class="flex items-center gap-2">
+                <span class="text-base">👵</span>
+                <div>
+                  <p class="text-xs font-bold text-gray-800">陳奶奶 (西環老街坊)</p>
+                  <p class="text-[10px] text-gray-400">1970年代口述 · 2小時前</p>
+                </div>
+              </div>
+              <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md font-bold">📖 童年記憶</span>
+            </div>
+            <p class="text-xs text-gray-700 leading-relaxed mb-2">
+              以前這裏還沒改建的時候，小時候下課總會跟同學在石拱廊下面玩捉迷藏，轉眼間幾十年過去了，景物依然很有溫度。
+            </p>
+            <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?w=500" class="w-full h-32 object-cover rounded-xl mb-2" alt="Memory Photo">
+            <div class="flex justify-between items-center text-[11px] text-gray-500 pt-1 border-t border-gray-100">
+              <button onclick="likePost(this)" class="hover:text-accentOrange flex items-center gap-1 font-semibold text-rose-500 bg-rose-50 px-2.5 py-0.5 rounded-full">
+                ❤️ <span>18</span>
+              </button>
+              <span>📍 高街社區綜合大樓</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========== SCREEN 5: REWARD STORE (鄰里優惠與獎勵商店) ========== -->
+    <div id="page-rewards" class="page">
+      <div class="p-4 flex flex-col gap-3 flex-1 overflow-y-auto no-scrollbar">
+        
+        <header class="flex justify-between items-center bg-cardBg p-3 rounded-2xl border border-lightGreen shadow-sm">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">🎁</span>
+            <div>
+              <h2 class="font-extrabold text-sm text-gray-800">
+                <span class="lang-zh">鄰里優惠與獎勵商店</span><span class="lang-en hidden">Neighbourhood Rewards</span>
+              </h2>
+              <p class="text-[10px] text-gray-500">
+                <span class="lang-zh">西環合作店家特約折扣與夥伴解鎖</span><span class="lang-en hidden">Local Shop Vouchers & Buddies</span>
+              </p>
+            </div>
+          </div>
+          <div class="bg-lightGreen/80 px-2.5 py-1 rounded-xl text-xs font-bold text-darkGreen">
+            🪙 <span class="global-tokens-display">260</span> Token
+          </div>
+        </header>
+
+        <!-- Category Filter Tabs (With dedicated Buddies tab) -->
+        <div class="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+          <button onclick="filterRewards('all')" id="tab-all" class="reward-tab-btn px-3 py-1 rounded-xl text-xs font-bold bg-darkGreen text-white transition shadow-xs whitespace-nowrap">
+            ✨ <span class="lang-zh">全部</span><span class="lang-en hidden">All</span>
+          </button>
+          <button onclick="filterRewards('coupons')" id="tab-coupons" class="reward-tab-btn px-3 py-1 rounded-xl text-xs font-bold bg-white text-gray-600 border border-gray-200 transition shadow-xs whitespace-nowrap">
+            🎫 <span class="lang-zh">店家優惠券</span><span class="lang-en hidden">Coupons</span>
+          </button>
+          <button onclick="filterRewards('buddies')" id="tab-buddies" class="reward-tab-btn px-3 py-1 rounded-xl text-xs font-bold bg-white text-gray-600 border border-gray-200 transition shadow-xs whitespace-nowrap">
+            🐾 <span class="lang-zh">散步夥伴</span><span class="lang-en hidden">Buddies</span>
+          </button>
+          <button onclick="filterRewards('gear')" id="tab-gear" class="reward-tab-btn px-3 py-1 rounded-xl text-xs font-bold bg-white text-gray-600 border border-gray-200 transition shadow-xs whitespace-nowrap">
+            ⛑️ <span class="lang-zh">頭像裝飾</span><span class="lang-en hidden">Gear</span>
+          </button>
+        </div>
+
+        <!-- Reward Items Grid -->
+        <div class="grid grid-cols-2 gap-2.5">
+          
+          <!-- Coupon Item 1 -->
+          <div class="reward-card coupons bg-cardBg p-3 rounded-2xl border border-lightGreen text-center flex flex-col justify-between shadow-xs">
+            <div>
+              <div class="w-12 h-12 mx-auto bg-amber-100 rounded-2xl flex items-center justify-center text-2xl mb-1.5 border border-amber-200">
+                ☕
+              </div>
+              <h4 class="font-bold text-xs text-gray-800">
+                <span class="lang-zh">西環小店咖啡優惠券</span><span class="lang-en hidden">Local Cafe Voucher</span>
+              </h4>
+              <p class="text-[10px] text-gray-500 mt-0.5 font-medium">憑券折抵 HK$15</p>
+            </div>
+            <div class="mt-2.5 pt-2 border-t border-gray-100">
+              <span class="text-xs font-extrabold text-accentOrange block mb-1">80 Token</span>
+              <button onclick="redeemReward('西環咖啡折價券', 80)" class="w-full py-1.5 bg-softGreen hover:bg-darkGreen text-white text-xs font-bold rounded-xl transition shadow-xs">
+                <span class="lang-zh">兌換</span><span class="lang-en hidden">Redeem</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Buddy Unlock Item 1 -->
+          <div class="reward-card buddies bg-cardBg p-3 rounded-2xl border border-lightGreen text-center flex flex-col justify-between shadow-xs">
+            <div>
+              <div class="w-12 h-12 mx-auto bg-emerald-100 rounded-2xl flex items-center justify-center text-2xl mb-1.5 border border-emerald-200">
+                🚃
+              </div>
+              <h4 class="font-bold text-xs text-gray-800">
+                <span class="lang-zh">丁丁電車精靈 (夥伴)</span><span class="lang-en hidden">Tram Spirit Buddy</span>
+              </h4>
+              <p class="text-[10px] text-emerald-700 mt-0.5 font-bold">古蹟任務 Token +10%</p>
+            </div>
+            <div class="mt-2.5 pt-2 border-t border-gray-100">
+              <span class="text-xs font-extrabold text-accentOrange block mb-1">100 Token</span>
+              <button id="unlock-btn-tram" onclick="unlockBuddy('丁丁電車精靈 🚃', '🚃', '+10% 復古景點 Token', 100, 'unlock-btn-tram')" class="w-full py-1.5 bg-darkGreen hover:bg-softGreen text-white text-xs font-bold rounded-xl transition shadow-xs">
+                <span class="lang-zh">解鎖夥伴</span><span class="lang-en hidden">Unlock Buddy</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Buddy Unlock Item 2 -->
+          <div class="reward-card buddies bg-cardBg p-3 rounded-2xl border border-lightGreen text-center flex flex-col justify-between shadow-xs">
+            <div>
+              <div class="w-12 h-12 mx-auto bg-sky-100 rounded-2xl flex items-center justify-center text-2xl mb-1.5 border border-sky-200">
+                🕊️
+              </div>
+              <h4 class="font-bold text-xs text-gray-800">
+                <span class="lang-zh">海旁海鷗 (夥伴)</span><span class="lang-en hidden">Seagull Buddy</span>
+              </h4>
+              <p class="text-[10px] text-sky-700 mt-0.5 font-bold">海邊打卡額外 +10 Token</p>
+            </div>
+            <div class="mt-2.5 pt-2 border-t border-gray-100">
+              <span class="text-xs font-extrabold text-accentOrange block mb-1">120 Token</span>
+              <button id="unlock-btn-gull" onclick="unlockBuddy('海旁海鷗 🕊️', '🕊️', '海邊打卡額外 +10 Token', 120, 'unlock-btn-gull')" class="w-full py-1.5 bg-darkGreen hover:bg-softGreen text-white text-xs font-bold rounded-xl transition shadow-xs">
+                <span class="lang-zh">解鎖夥伴</span><span class="lang-en hidden">Unlock Buddy</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Gear Item 1 -->
+          <div class="reward-card gear bg-cardBg p-3 rounded-2xl border border-lightGreen text-center flex flex-col justify-between shadow-xs">
+            <div>
+              <div class="w-12 h-12 mx-auto bg-rose-100 rounded-2xl flex items-center justify-center text-2xl mb-1.5 border border-rose-200">
+                ⛑️
+              </div>
+              <h4 class="font-bold text-xs text-gray-800">
+                <span class="lang-zh">可愛冒險安全帽</span><span class="lang-en hidden">Adventure Helmet</span>
+              </h4>
+              <p class="text-[10px] text-gray-500 mt-0.5 font-medium">個人造型頭飾</p>
+            </div>
+            <div class="mt-2.5 pt-2 border-t border-gray-100">
+              <span class="text-xs font-extrabold text-accentOrange block mb-1">30 Token</span>
+              <button onclick="redeemReward('可愛冒險安全帽', 30)" class="w-full py-1.5 bg-softGreen hover:bg-darkGreen text-white text-xs font-bold rounded-xl transition shadow-xs">
+                <span class="lang-zh">兌換</span><span class="lang-en hidden">Redeem</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========== SCREEN 6: ENHANCED PROFILE (我的頁面) ========== -->
+    <div id="page-profile" class="page">
+      <div class="p-0 flex flex-col flex-1 overflow-y-auto no-scrollbar">
+        
+        <!-- Nature Forest Hills Header Background -->
+        <div class="relative bg-gradient-to-b from-[#8FA963] via-[#a3bf73] to-[#FBF8EE] pt-4 pb-6 px-4 text-center overflow-hidden">
+          
+          <!-- Clean Native Title Bar (Removed glitchy status icons) -->
+          <div class="flex justify-between items-center text-white/95 mb-3 text-xs relative z-10 px-1">
+            <button onclick="switchPage('page-home')" class="hover:text-amber-200 transition">
+              <i class="fa-solid fa-chevron-left text-sm"></i>
+            </button>
+            <span class="font-extrabold text-sm tracking-wide">Neighbourhood Go!</span>
+            <div class="bg-black/20 px-2.5 py-1 rounded-full text-[10px] font-bold border border-white/20 backdrop-blur-xs">
+              <span>📍 西環地區</span>
+            </div>
+          </div>
+
+          <!-- Decorative SVG Forest Hill Background -->
+          <svg class="absolute inset-0 w-full h-full opacity-30 pointer-events-none" viewBox="0 0 390 220" fill="none">
+            <path d="M-20 180 Q60 110, 160 160 T350 140 T420 190 Z" fill="#5C7A2D"/>
+            <path d="M80 200 Q200 130, 310 170 T420 220 Z" fill="#8FA963"/>
+            <circle cx="60" cy="80" r="3" fill="#FFFDF5"/>
+            <circle cx="320" cy="70" r="4" fill="#FEF08A"/>
+          </svg>
+
+          <!-- Avatar & Active Buddy Icon Overlay -->
+          <div class="relative w-24 h-24 mx-auto mb-2 relative z-10">
+            <div class="w-full h-full rounded-full bg-[#FFFDF5] border-4 border-[#5C7A2D] p-1 shadow-md overflow-hidden flex items-center justify-center">
+              <svg viewBox="0 0 100 100" class="w-full h-full">
+                <path d="M20 50 C20 20, 80 20, 80 50 C80 55, 75 60, 75 60 C75 35, 25 35, 25 60 Z" fill="#654321"/>
+                <circle cx="50" cy="55" r="28" fill="#FDE047"/>
+                <circle cx="50" cy="55" r="27" fill="#FFEDD5"/>
+                <circle cx="40" cy="52" r="3.5" fill="#334155"/>
+                <circle cx="60" cy="52" r="3.5" fill="#334155"/>
+                <path d="M43 62 Q50 68, 57 62" fill="none" stroke="#334155" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="35" cy="58" r="4" fill="#FDA4AF" opacity="0.6"/>
+                <circle cx="65" cy="58" r="4" fill="#FDA4AF" opacity="0.6"/>
+                <path d="M25 85 Q50 72, 75 85 L75 100 L25 100 Z" fill="#5C7A2D"/>
+              </svg>
+            </div>
+            <div id="profile-buddy-badge" class="absolute -bottom-1 -right-1 bg-white border-2 border-amber-400 w-8 h-8 rounded-full flex items-center justify-center text-base shadow-sm">
+              🐈
+            </div>
+          </div>
+
+          <!-- User Title & Name -->
+          <div class="flex flex-col items-center justify-center gap-1 mb-1 relative z-10">
+            <div class="flex items-center gap-2">
+              <h3 class="font-extrabold text-xl text-gray-900 tracking-tight leading-none">小林</h3>
+              <span class="bg-amber-300 border border-amber-400 text-amber-950 text-xs font-black px-2.5 py-0.5 rounded-full shadow-xs">
+                Lv.6
+              </span>
+            </div>
+            
+            <button onclick="openModal('modal-title')" class="text-xs bg-white/90 hover:bg-white text-darkGreen px-2.5 py-1 rounded-full font-extrabold border border-darkGreen/30 shadow-xs flex items-center gap-1 my-0.5">
+              🏷️ <span id="profile-equipped-title">
+                <span class="lang-zh">【堅尼地城日落大使】</span>
+                <span class="lang-en hidden">[Sunset Ambassador]</span>
+              </span>
+              <i class="fa-solid fa-pen-to-square text-[10px] text-gray-500"></i>
+            </button>
+          </div>
+
+          <!-- White Floating Stats Card (3 Columns) -->
+          <div class="bg-white rounded-3xl p-3.5 border border-gray-100 shadow-md grid grid-cols-3 divide-x divide-gray-100 relative z-10 mx-2 mt-3">
+            <div class="text-center px-1">
+              <p class="text-[11px] text-gray-500 font-bold mb-1">
+                <span class="lang-zh">外出打卡</span><span class="lang-en hidden">Outings</span>
+              </p>
+              <p class="font-black text-lg text-darkGreen leading-none">12</p>
+              <p class="text-[10px] text-gray-400 font-medium mt-0.5">
+                <span class="lang-zh">12 次</span><span class="lang-en hidden">12 times</span>
+              </p>
+            </div>
+
+            <div class="text-center px-1">
+              <p class="text-[11px] text-gray-500 font-bold mb-1">
+                <span class="lang-zh">造訪地標</span><span class="lang-en hidden">Visited</span>
+              </p>
+              <p class="font-black text-lg text-darkGreen leading-none">8</p>
+              <p class="text-[10px] text-gray-400 font-medium mt-0.5">
+                <span class="lang-zh">8 個地點</span><span class="lang-en hidden">8 spots</span>
+              </p>
+            </div>
+
+            <div class="text-center px-1">
+              <p class="text-[11px] text-gray-500 font-bold mb-1">
+                <span class="lang-zh">累積行走</span><span class="lang-en hidden">Walked</span>
+              </p>
+              <p class="font-black text-lg text-darkGreen leading-none">46</p>
+              <p class="text-[10px] text-gray-400 font-medium mt-0.5">
+                <span class="lang-zh">46 km</span><span class="lang-en hidden">46 km</span>
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- PROFILE CONTENT BODY -->
+        <div class="p-4 space-y-4">
+          
+          <!-- BUDDY SYSTEM CARD -->
+          <div class="bg-cardBg p-3.5 rounded-2xl border border-lightGreen shadow-sm space-y-2">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">🐾</span>
+                <div>
+                  <h4 class="font-extrabold text-xs text-gray-800">
+                    <span class="lang-zh">社區散步夥伴</span><span class="lang-en hidden">Community Buddy System</span>
+                  </h4>
+                  <p class="text-[10px] text-gray-500 font-medium">
+                    <span class="lang-zh">同行散步可獲得額外 Token 加成</span>
+                    <span class="lang-en hidden">Walk together for bonus Token perks</span>
+                  </p>
+                </div>
+              </div>
+              <button onclick="openModal('modal-buddy')" class="text-[11px] bg-lightGreen text-darkGreen font-bold px-2.5 py-1 rounded-xl hover:bg-softGreen hover:text-white transition shadow-xs">
+                <span class="lang-zh">更換夥伴</span><span class="lang-en hidden">Switch Buddy</span>
+              </button>
+            </div>
+
+            <div class="bg-white p-2.5 rounded-xl border border-gray-100 flex items-center gap-3">
+              <div id="buddy-icon-display" class="w-12 h-12 bg-amber-50 rounded-2xl border border-amber-200 flex items-center justify-center text-2xl shadow-xs">
+                🐈
+              </div>
+              <div class="flex-1">
+                <div class="flex justify-between items-center mb-0.5">
+                  <h5 id="buddy-name-display" class="font-bold text-xs text-gray-800">西環巷仔貓 (Cat)</h5>
+                  <span class="text-[10px] text-rose-500 font-extrabold">親密度 Lv.3</span>
+                </div>
+                <p id="buddy-perk-display" class="text-[10px] text-amber-700 font-semibold mb-1">❤️❤️❤️🤍🤍 (+5% Token 散步獎勵)</p>
+                <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-rose-400 w-3/5 rounded-full"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DISTRICT EXPLORATION PROGRESS GAUGES -->
+          <div class="bg-cardBg p-3.5 rounded-2xl border border-lightGreen shadow-sm space-y-2.5">
+            <div class="flex justify-between items-center">
+              <h4 class="font-extrabold text-xs text-gray-800 flex items-center gap-1.5">
+                <i class="fa-solid fa-chart-pie text-darkGreen"></i>
+                <span class="lang-zh">社區探索進度度量牆</span><span class="lang-en hidden">District Exploration Gauges</span>
+              </h4>
+              <span class="text-xs font-black text-accentOrange bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-200">
+                <span class="lang-zh">總解鎖 58%</span><span class="lang-en hidden">Unlocked 58%</span>
+              </span>
+            </div>
+
+            <div class="space-y-2 text-xs">
+              <div>
+                <div class="flex justify-between text-[11px] font-bold mb-1">
+                  <span class="text-gray-700">🌊 堅尼地城 (Kennedy Town)</span>
+                  <span class="text-darkGreen">72%</span>
+                </div>
+                <div class="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                  <div class="h-full bg-softGreen rounded-full" style="width: 72%;"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-[11px] font-bold mb-1">
+                  <span class="text-gray-700">🏛️ 西營盤 (Sai Ying Pun)</span>
+                  <span class="text-amber-600">45%</span>
+                </div>
+                <div class="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                  <div class="h-full bg-amber-500 rounded-full" style="width: 45%;"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-[11px] font-bold mb-1">
+                  <span class="text-gray-700">⛵ 石塘咀 (Shek Tong Tsui)</span>
+                  <span class="text-sky-600">20%</span>
+                </div>
+                <div class="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                  <div class="h-full bg-sky-500 rounded-full" style="width: 20%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ACHIEVEMENT BADGES GRID SECTION -->
+          <div class="space-y-2">
+            
+            <div class="flex justify-between items-center px-1">
+              <span class="text-xs font-black text-gray-800 flex items-center gap-1.5">
+                <i class="fa-solid fa-medal text-amber-500"></i>
+                <span class="lang-zh">成就徽章牆</span><span class="lang-en hidden">Achievement Badges</span>
+              </span>
+              <button onclick="openAllBadgesModal()" class="text-xs text-darkGreen font-extrabold hover:underline flex items-center gap-1">
+                <span class="lang-zh">查看全部 12 個 →</span><span class="lang-en hidden">View All 12 →</span>
+              </button>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2.5">
+              
+              <div onclick="openAllBadgesModal()" class="bg-cardBg p-2.5 rounded-2xl border border-lightGreen text-center flex flex-col items-center shadow-xs cursor-pointer hover:border-softGreen">
+                <div class="w-12 h-12 relative flex items-center justify-center">
+                  <svg viewBox="0 0 100 100" class="w-full h-full">
+                    <path d="M50 10 L88 30 L88 70 L50 90 L12 70 L12 30 Z" fill="#FEF08A" stroke="#E98A3D" stroke-width="4"/>
+                    <circle cx="50" cy="50" r="22" fill="#38BDF8"/>
+                    <path d="M50 35 C44 35 40 39 40 45 C40 53 50 60 50 60 C50 60 60 53 60 45 C60 39 56 35 50 35 Z" fill="#EF4444"/>
+                  </svg>
+                </div>
+                <p class="text-xs font-extrabold text-gray-800 mt-1">
+                  <span class="lang-zh">首次打卡</span><span class="lang-en hidden">First Check</span>
+                </p>
+              </div>
+
+              <div onclick="openAllBadgesModal()" class="bg-cardBg p-2.5 rounded-2xl border border-lightGreen text-center flex flex-col items-center shadow-xs cursor-pointer hover:border-softGreen">
+                <div class="w-12 h-12 relative flex items-center justify-center">
+                  <svg viewBox="0 0 100 100" class="w-full h-full">
+                    <circle cx="50" cy="50" r="44" fill="#FFFDF5" stroke="#E98A3D" stroke-width="4"/>
+                    <path d="M22 65 C 12 45, 22 25, 48 18" fill="none" stroke="#5C7A2D" stroke-width="4" stroke-linecap="round"/>
+                    <path d="M78 65 C 88 45, 78 25, 52 18" fill="none" stroke="#5C7A2D" stroke-width="4" stroke-linecap="round"/>
+                    <rect x="36" y="42" width="28" height="22" rx="2" fill="#8FA963" />
+                    <polygon points="34,42 50,30 66,42" fill="#E98A3D" />
+                  </svg>
+                </div>
+                <p class="text-xs font-extrabold text-gray-800 mt-1">
+                  <span class="lang-zh">舊街探索</span><span class="lang-en hidden">Old Street</span>
+                </p>
+              </div>
+
+              <div onclick="openAllBadgesModal()" class="bg-cardBg p-2.5 rounded-2xl border border-lightGreen text-center flex flex-col items-center shadow-xs cursor-pointer hover:border-softGreen">
+                <div class="w-12 h-12 relative flex items-center justify-center">
+                  <svg viewBox="0 0 100 100" class="w-full h-full">
+                    <polygon points="50,8 90,36 75,85 25,85 10,36" fill="#FFFBEB" stroke="#D97706" stroke-width="4"/>
+                    <rect x="35" y="42" width="30" height="25" fill="#B45309" rx="2"/>
+                    <polygon points="30,42 50,24 70,42" fill="#F59E0B"/>
+                  </svg>
+                </div>
+                <p class="text-xs font-extrabold text-gray-800 mt-1">
+                  <span class="lang-zh">古蹟達人</span><span class="lang-en hidden">Heritage</span>
+                </p>
+              </div>
+
+              <div onclick="openAllBadgesModal()" class="bg-cardBg p-2.5 rounded-2xl border border-lightGreen text-center flex flex-col items-center shadow-xs cursor-pointer hover:border-softGreen">
+                <div class="w-12 h-12 relative flex items-center justify-center">
+                  <svg viewBox="0 0 100 100" class="w-full h-full">
+                    <circle cx="50" cy="50" r="42" fill="#FFEDD5" stroke="#F97316" stroke-width="4"/>
+                    <circle cx="50" cy="42" r="18" fill="#F97316"/>
+                    <path d="M15 68 Q 50 55, 85 68 Q 50 80, 15 68 Z" fill="#0284C7"/>
+                  </svg>
+                </div>
+                <p class="text-xs font-extrabold text-gray-800 mt-1">
+                  <span class="lang-zh">西環落日</span><span class="lang-en hidden">Sunset</span>
+                </p>
+              </div>
+
+              <div onclick="openAllBadgesModal()" class="bg-cardBg p-2.5 rounded-2xl border border-lightGreen text-center flex flex-col items-center shadow-xs cursor-pointer hover:border-softGreen">
+                <div class="w-12 h-12 relative flex items-center justify-center">
+                  <svg viewBox="0 0 100 100" class="w-full h-full">
+                    <circle cx="50" cy="50" r="42" fill="#FCE7F3" stroke="#EC4899" stroke-width="4"/>
+                    <circle cx="38" cy="45" r="12" fill="#F43F5E"/>
+                    <circle cx="62" cy="45" r="12" fill="#FB7185"/>
+                  </svg>
+                </div>
+                <p class="text-xs font-extrabold text-gray-800 mt-1">
+                  <span class="lang-zh">結伴同行</span><span class="lang-en hidden">Duo Walker</span>
+                </p>
+              </div>
+
+              <div onclick="openAllBadgesModal()" class="bg-cardBg p-2.5 rounded-2xl border border-lightGreen text-center flex flex-col items-center shadow-xs cursor-pointer hover:border-softGreen">
+                <div class="w-12 h-12 relative flex items-center justify-center">
+                  <svg viewBox="0 0 100 100" class="w-full h-full">
+                    <circle cx="50" cy="50" r="42" fill="#FEF3C7" stroke="#D97706" stroke-width="4"/>
+                    <rect x="35" y="45" width="30" height="25" fill="#78350F" rx="3"/>
+                    <path d="M30 45 Q50 30, 70 45 Z" fill="#F59E0B"/>
+                  </svg>
+                </div>
+                <p class="text-xs font-extrabold text-gray-800 mt-1">
+                  <span class="lang-zh">社區老饕</span><span class="lang-en hidden">Foodie</span>
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Recent Footprints Log -->
+          <div class="pt-2 border-t border-gray-200/80">
+            <h5 class="text-xs font-extrabold text-gray-700 mb-2 flex items-center gap-1.5">
+              <i class="fa-solid fa-shoe-prints text-softGreen"></i>
+              <span class="lang-zh">近期探索足跡</span><span class="lang-en hidden">Recent Footprints</span>
+            </h5>
+            <div class="space-y-1.5 text-[11px] text-gray-600">
+              <div class="bg-cardBg p-2.5 rounded-xl border border-lightGreen flex justify-between items-center">
+                <span>📍 高街社區綜合大樓 (打卡成功)</span>
+                <span class="text-darkGreen font-bold">+45 Token</span>
+              </div>
+              <div class="bg-cardBg p-2.5 rounded-xl border border-lightGreen flex justify-between items-center">
+                <span>📍 堅尼地城海旁日落角</span>
+                <span class="text-darkGreen font-bold">+20 Token</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========== MODAL A: VIEW ALL 12 BADGES (UNLOCKED & LOCKED) ========== -->
+    <div id="modal-all-badges" class="absolute inset-0 bg-black/60 backdrop-blur-xs z-40 hidden flex justify-center items-center p-3">
+      <div class="bg-cardBg rounded-3xl p-4 w-full max-w-sm max-h-[85vh] overflow-y-auto no-scrollbar shadow-2xl border-2 border-softGreen space-y-3">
+        
+        <div class="flex justify-between items-center border-b border-gray-200 pb-2">
+          <h3 class="font-black text-sm text-gray-800 flex items-center gap-1.5">
+            🏆 <span class="lang-zh">社區成就徽章冊 (4/12 已解鎖)</span>
+            <span class="lang-en hidden">Badges Guide (4/12 Unlocked)</span>
+          </h3>
+          <button onclick="closeModal('modal-all-badges')" class="w-6 h-6 rounded-full bg-gray-200 text-gray-600 font-bold text-xs flex items-center justify-center">✕</button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div class="bg-white p-2.5 rounded-2xl border-2 border-emerald-400 text-center flex flex-col items-center shadow-xs">
+            <div class="w-12 h-12 mb-1">
+              <svg viewBox="0 0 100 100" class="w-full h-full">
+                <path d="M50 10 L88 30 L88 70 L50 90 L12 70 L12 30 Z" fill="#FEF08A" stroke="#E98A3D" stroke-width="4"/>
+                <circle cx="50" cy="50" r="22" fill="#38BDF8"/>
+                <path d="M50 35 C44 35 40 39 40 45 C40 53 50 60 50 60 C50 60 60 53 60 45 C60 39 56 35 50 35 Z" fill="#EF4444"/>
+              </svg>
+            </div>
+            <h5 class="font-extrabold text-xs text-gray-800">首次打卡</h5>
+            <span class="text-[9px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold mt-1">✓ 已解鎖</span>
+          </div>
+
+          <div class="bg-white p-2.5 rounded-2xl border-2 border-emerald-400 text-center flex flex-col items-center shadow-xs">
+            <div class="w-12 h-12 mb-1">
+              <svg viewBox="0 0 100 100" class="w-full h-full">
+                <circle cx="50" cy="50" r="44" fill="#FFFDF5" stroke="#E98A3D" stroke-width="4"/>
+                <path d="M22 65 C 12 45, 22 25, 48 18" fill="none" stroke="#5C7A2D" stroke-width="4" stroke-linecap="round"/>
+                <path d="M78 65 C 88 45, 78 25, 52 18" fill="none" stroke="#5C7A2D" stroke-width="4" stroke-linecap="round"/>
+                <rect x="36" y="42" width="28" height="22" rx="2" fill="#8FA963" />
+                <polygon points="34,42 50,30 66,42" fill="#E98A3D" />
+              </svg>
+            </div>
+            <h5 class="font-extrabold text-xs text-gray-800">古蹟達人</h5>
+            <span class="text-[9px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold mt-1">✓ 已解鎖</span>
+          </div>
+
+          <div class="bg-gray-100 p-2.5 rounded-2xl border border-gray-300 text-center flex flex-col items-center opacity-75 relative">
+            <span class="absolute top-2 right-2 text-xs">🔒</span>
+            <div class="w-12 h-12 mb-1 grayscale">
+              <svg viewBox="0 0 100 100" class="w-full h-full">
+                <circle cx="50" cy="50" r="42" fill="#CBD5E1" stroke="#64748B" stroke-width="4"/>
+                <circle cx="50" cy="40" r="16" fill="#64748B"/>
+              </svg>
+            </div>
+            <h5 class="font-bold text-xs text-gray-700">藝里坊大師</h5>
+            <p class="text-[9px] text-gray-500 mt-1">解鎖：造訪藝里坊 3 次</p>
+          </div>
+
+          <div class="bg-gray-100 p-2.5 rounded-2xl border border-gray-300 text-center flex flex-col items-center opacity-75 relative">
+            <span class="absolute top-2 right-2 text-xs">🔒</span>
+            <div class="w-12 h-12 mb-1 grayscale">
+              <svg viewBox="0 0 100 100" class="w-full h-full">
+                <circle cx="50" cy="50" r="42" fill="#CBD5E1" stroke="#64748B" stroke-width="4"/>
+                <path d="M30 40 L70 40 L50 70 Z" fill="#64748B"/>
+              </svg>
+            </div>
+            <h5 class="font-bold text-xs text-gray-700">叮叮車收藏家</h5>
+            <p class="text-[9px] text-gray-500 mt-1">解鎖：乘坐電車打卡 5 次</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL B: SELECT BUDDY COMPANION -->
+    <div id="modal-buddy" class="absolute inset-0 bg-black/60 backdrop-blur-xs z-40 hidden flex justify-center items-center p-4">
+      <div class="bg-cardBg rounded-3xl p-4 w-full max-w-xs shadow-2xl border-2 border-softGreen space-y-3">
+        <div class="flex justify-between items-center border-b border-gray-200 pb-2">
+          <h3 class="font-black text-sm text-gray-800">
+            <span class="lang-zh">🐾 選擇你的散步夥伴</span><span class="lang-en hidden">Select Walking Buddy</span>
+          </h3>
+          <button onclick="closeModal('modal-buddy')" class="w-6 h-6 rounded-full bg-gray-200 text-gray-600 font-bold text-xs">✕</button>
+        </div>
+
+        <div id="buddy-selection-list" class="space-y-2">
+          <!-- Default Buddy -->
+          <button onclick="selectBuddy('西環巷仔貓 🐈', '🐈', '散步額外 +5% Token')" class="w-full p-2.5 bg-white hover:bg-amber-50 rounded-xl border border-gray-200 flex items-center gap-3 text-left transition">
+            <span class="text-3xl">🐈</span>
+            <div>
+              <p class="font-extrabold text-xs text-gray-800">西環巷仔貓 (Cat)</p>
+              <p class="text-[10px] text-amber-700 font-medium">特技: 散步額外 +5% Token</p>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL C: EQUIPPABLE TITLES -->
+    <div id="modal-title" class="absolute inset-0 bg-black/60 backdrop-blur-xs z-40 hidden flex justify-center items-center p-4">
+      <div class="bg-cardBg rounded-3xl p-4 w-full max-w-xs shadow-2xl border-2 border-softGreen space-y-3">
+        <div class="flex justify-between items-center border-b border-gray-200 pb-2">
+          <h3 class="font-black text-sm text-gray-800">🏷️ 佩戴你的社區稱號</h3>
+          <button onclick="closeModal('modal-title')" class="w-6 h-6 rounded-full bg-gray-200 text-gray-600 font-bold text-xs">✕</button>
+        </div>
+
+        <div class="space-y-2">
+          <button onclick="equipTitle('【堅尼地城日落大使】')" class="w-full p-2.5 bg-amber-50 hover:bg-amber-100 rounded-xl border border-amber-300 text-left font-extrabold text-xs text-amber-900 flex justify-between items-center">
+            <span>🏷️ 【堅尼地城日落大使】</span>
+            <span class="text-[10px] bg-amber-200 px-2 py-0.5 rounded-full">已解鎖</span>
+          </button>
+
+          <button onclick="equipTitle('【西環舊街散步達人】')" class="w-full p-2.5 bg-emerald-50 hover:bg-emerald-100 rounded-xl border border-emerald-300 text-left font-extrabold text-xs text-emerald-900 flex justify-between items-center">
+            <span>🏷️ 【西環舊街散步達人】</span>
+            <span class="text-[10px] bg-emerald-200 px-2 py-0.5 rounded-full">已解鎖</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QR Code Redemption Modal Popup -->
+    <div id="modal-qr" class="absolute inset-0 bg-black/60 backdrop-blur-xs z-40 hidden flex justify-center items-center p-4">
+      <div class="bg-white rounded-3xl p-5 text-center max-w-[280px] w-full shadow-2xl relative border-2 border-softGreen">
+        <h3 id="qr-title" class="text-sm font-bold text-gray-800 mb-1">兌換券核銷碼</h3>
+        <p class="text-[10px] text-gray-500 mb-3">請向西環合作店家出示此二維碼</p>
+        
+        <div class="w-36 h-36 mx-auto bg-stone-100 p-2 rounded-xl flex items-center justify-center border border-stone-200 shadow-inner">
+          <svg class="w-full h-full" viewBox="0 0 100 100" fill="#2C1D11">
+            <rect width="100" height="100" fill="#FFFFFF"/>
+            <rect x="10" y="10" width="25" height="25" fill="#2C1D11"/>
+            <rect x="15" y="15" width="15" height="15" fill="#FFFFFF"/>
+            <rect x="18" y="18" width="9" height="9" fill="#2C1D11"/>
+            <rect x="65" y="10" width="25" height="25" fill="#2C1D11"/>
+            <rect x="70" y="15" width="15" height="15" fill="#FFFFFF"/>
+            <rect x="73" y="18" width="9" height="9" fill="#2C1D11"/>
+            <rect x="10" y="65" width="25" height="25" fill="#2C1D11"/>
+            <rect x="15" y="70" width="15" height="15" fill="#FFFFFF"/>
+            <rect x="18" y="73" width="9" height="9" fill="#2C1D11"/>
+            <rect x="45" y="45" width="12" height="12" fill="#E98A3D"/>
+          </svg>
+        </div>
+
+        <button onclick="closeModal('modal-qr')" class="w-full py-2.5 mt-4 bg-softGreen text-white text-xs font-bold rounded-xl shadow">
+          完成核銷
+        </button>
+      </div>
+    </div>
+
+    <!-- Fixed Bottom Navigation Bar -->
+    <nav class="absolute bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-gray-200 grid grid-cols-4 py-2 text-center z-20">
+      <button onclick="switchPage('page-home')" id="nav-home" class="flex flex-col items-center text-darkGreen font-bold">
+        <i class="fa-solid fa-house text-base"></i>
+        <span class="text-[10px] font-bold mt-0.5"><span class="lang-zh">首頁</span><span class="lang-en hidden">Home</span></span>
+      </button>
+      <button onclick="switchPage('page-fog-unlock')" id="nav-fog" class="flex flex-col items-center text-gray-400 hover:text-darkGreen">
+        <i class="fa-solid fa-map-location-dot text-base"></i>
+        <span class="text-[10px] font-bold mt-0.5"><span class="lang-zh">地圖迷霧</span><span class="lang-en hidden">Map</span></span>
+      </button>
+      <button onclick="switchPage('page-rewards')" id="nav-rewards" class="flex flex-col items-center text-gray-400 hover:text-darkGreen">
+        <i class="fa-solid fa-gift text-base"></i>
+        <span class="text-[10px] font-bold mt-0.5"><span class="lang-zh">獎勵</span><span class="lang-en hidden">Rewards</span></span>
+      </button>
+      <button onclick="switchPage('page-profile')" id="nav-profile" class="flex flex-col items-center text-gray-400 hover:text-darkGreen">
+        <i class="fa-solid fa-user text-base"></i>
+        <span class="text-[10px] font-bold mt-0.5"><span class="lang-zh">我的</span><span class="lang-en hidden">Profile</span></span>
+      </button>
+    </nav>
+
+  </div>
+
+  <script>
+    const landmarkDatabase = [
+      {
+        name: "高街社區綜合大樓 (舊建築)",
+        nameEn: "High Street Community Complex",
+        district: "西營盤",
+        districtEn: "Sai Ying Pun",
+        tags: "古典、建築、古蹟",
+        tagsEn: "Classics, Architecture",
+        desc: "二級歷史建築，花崗石拱廊極具維多利亞時代古典風格，漫步期間如同穿越時空。",
+        descEn: "Grade II Historic Building featuring Victorian granite archways.",
+        tokens: 45,
+        badgeZh: "古蹟達人",
+        badgeEn: "Historic Explorer",
+        routeZh: "沿高街直行 200 米 ➔ 正街轉左",
+        routeEn: "Walk 200m down High St ➔ Turn left on Centre St",
+        checkins: 15,
+        image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600",
+        svgBadge: `<svg viewBox="0 0 100 100" class="w-full h-full">
+          <circle cx="50" cy="50" r="44" fill="#FFFDF5" stroke="#E98A3D" stroke-width="4"/>
+          <path d="M25 65 C 15 45, 25 25, 48 20" fill="none" stroke="#5C7A2D" stroke-width="4" stroke-linecap="round"/>
+          <path d="M75 65 C 85 45, 75 25, 52 20" fill="none" stroke="#5C7A2D" stroke-width="4" stroke-linecap="round"/>
+          <rect x="36" y="42" width="28" height="22" rx="2" fill="#8FA963" />
+          <polygon points="34,42 50,30 66,42" fill="#E98A3D" />
+        </svg>`
+      },
+      {
+        name: "堅尼地城海旁日落角",
+        nameEn: "Kennedy Town Praya Sunset",
+        district: "堅尼地城",
+        districtEn: "Kennedy Town",
+        tags: "海景、日落、攝影",
+        tagsEn: "Sea view, Sunset, Photography",
+        desc: "西環最受歡迎的日落海景勝地，欣賞維多利亞港落日餘暉與海風交織的浪漫。",
+        descEn: "Famous sunset spot at Kennedy Town waterfront with sea breeze.",
+        tokens: 20,
+        badgeZh: "西環落日",
+        badgeEn: "Sunset Collector",
+        routeZh: "沿吉席街步行 300 米 ➔ 堅尼地城海旁",
+        routeEn: "Walk 300m down Catchick St ➔ K-Town Praya",
+        checkins: 42,
+        image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600",
+        svgBadge: `<svg viewBox="0 0 100 100" class="w-full h-full">
+          <circle cx="50" cy="50" r="44" fill="#FFEDD5" stroke="#F97316" stroke-width="4"/>
+          <circle cx="50" cy="42" r="18" fill="#F97316"/>
+          <path d="M15 68 Q 50 55, 85 68 Q 50 80, 15 68 Z" fill="#0284C7"/>
+        </svg>`
+      },
+      {
+        name: "西營盤藝里坊壁畫街",
+        nameEn: "Artlane Street Murals",
+        district: "西營盤",
+        districtEn: "Sai Ying Pun",
+        tags: "壁畫、藝術、小店",
+        tagsEn: "Murals, Art, Local Cafes",
+        desc: "充滿英倫風情與本地塗鴉藝術的巷弄，適合與夥伴一同拍照打卡漫步。",
+        descEn: "Vibrant urban mural lane with colorful street art and cozy coffee shops.",
+        tokens: 30,
+        badgeZh: "街頭藝術家",
+        badgeEn: "Mural Master",
+        routeZh: "出西營盤站 B3 出口 ➔ 忠正街藝里坊",
+        routeEn: "SYP Station Exit B3 ➔ Chung Ching St Artlane",
+        checkins: 28,
+        image: "https://images.unsplash.com/photo-1561055657-b9e0bf0fa360?w=600",
+        svgBadge: `<svg viewBox="0 0 100 100" class="w-full h-full">
+          <circle cx="50" cy="50" r="44" fill="#FCE7F3" stroke="#EC4899" stroke-width="4"/>
+          <path d="M30 40 Q50 20, 70 40 Q80 60, 50 75 Q20 60, 30 40 Z" fill="#F43F5E"/>
+          <circle cx="50" cy="45" r="10" fill="#FEF08A"/>
+        </svg>`
+      }
+    ];
+
+    let currentTokens = 260;
+    let selectedModeMultiplier = 1.0;
+    let currentLandmarkIdx = 0;
+    let selectedImageBase64 = null;
+    let hasCompletedMission = false;
+
+    // List of unlocked buddies
+    const unlockedBuddies = [
+      { name: "西環巷仔貓 🐈", icon: "🐈", perk: "散步額外 +5% Token" }
+    ];
+
+    function updateAllTokenDisplays() {
+      document.querySelectorAll('.global-tokens-display').forEach(el => {
+        el.innerText = currentTokens;
+      });
+    }
+
+    function switchPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+
+      const navs = ['home', 'fog', 'rewards', 'profile'];
+      navs.forEach(n => {
+        const btn = document.getElementById('nav-' + n);
+        if (btn) {
+          if ((pageId === 'page-' + n) || (pageId === 'page-detail' && n === 'home') || (pageId === 'page-memories' && n === 'home')) {
+            btn.className = "flex flex-col items-center text-darkGreen font-bold";
+          } else {
+            btn.className = "flex flex-col items-center text-gray-400 hover:text-darkGreen";
+          }
+        }
+      });
+    }
+
+    function toggleLanguage() {
+      const isZh = document.querySelector('.lang-zh').classList.contains('hidden');
+      document.querySelectorAll('.lang-zh').forEach(el => el.classList.toggle('hidden', !isZh));
+      document.querySelectorAll('.lang-en').forEach(el => el.classList.toggle('hidden', isZh));
+      document.getElementById('lang-btn-text').innerText = isZh ? 'EN' : '繁';
+    }
+
+    function randomizeLocation() {
+      currentLandmarkIdx = (currentLandmarkIdx + 1) % landmarkDatabase.length;
+      const data = landmarkDatabase[currentLandmarkIdx];
+      const isZh = !document.querySelector('.lang-zh').classList.contains('hidden');
+
+      document.getElementById('target-title').innerText = isZh ? data.name : data.nameEn;
+      document.getElementById('target-district').innerText = isZh ? data.district : data.districtEn;
+      document.getElementById('target-desc').innerText = isZh ? data.desc : data.descEn;
+      document.getElementById('target-image').src = data.image;
+
+      document.getElementById('detail-header-title').innerText = isZh ? data.name : data.nameEn;
+      document.getElementById('detail-tags').innerText = isZh ? data.tags : data.tagsEn;
+      document.getElementById('detail-full-desc').innerText = isZh ? data.desc : data.descEn;
+      document.getElementById('detail-image').src = data.image;
+      document.getElementById('detail-checkin-count').innerText = data.checkins;
+
+      document.getElementById('route-instruction-zh').innerText = data.routeZh;
+      document.getElementById('route-instruction-en').innerText = data.routeEn;
+
+      updateDetailRewardText();
+    }
+
+    function selectMode(mode) {
+      const btnSolo = document.getElementById('mode-solo');
+      const btnDuo = document.getElementById('mode-duo');
+      if (mode === 'solo') {
+        selectedModeMultiplier = 1.0;
+        btnSolo.className = "py-2 px-3 rounded-xl border-2 border-softGreen bg-lightGreen text-darkGreen text-xs font-bold flex items-center justify-center gap-1 transition-all";
+        btnDuo.className = "py-2 px-3 rounded-xl border border-gray-200 bg-white text-gray-600 text-xs font-bold flex items-center justify-center gap-1 transition-all";
+      } else {
+        selectedModeMultiplier = 1.5;
+        btnDuo.className = "py-2 px-3 rounded-xl border-2 border-softGreen bg-lightGreen text-darkGreen text-xs font-bold flex items-center justify-center gap-1 transition-all";
+        btnSolo.className = "py-2 px-3 rounded-xl border border-gray-200 bg-white text-gray-600 text-xs font-bold flex items-center justify-center gap-1 transition-all";
+      }
+      updateDetailRewardText();
+    }
+
+    function updateDetailRewardText() {
+      const data = landmarkDatabase[currentLandmarkIdx];
+      const earned = Math.round(data.tokens * selectedModeMultiplier);
+      document.getElementById('detail-reward-text').innerText = `+${earned} Token`;
+    }
+
+    function triggerCheckin() {
+      const data = landmarkDatabase[currentLandmarkIdx];
+      const earned = Math.round(data.tokens * selectedModeMultiplier);
+      currentTokens += earned;
+      hasCompletedMission = true;
+      
+      updateAllTokenDisplays();
+      document.getElementById('modal-token-amount').innerText = `+${earned} Token`;
+      
+      const isZh = !document.querySelector('.lang-zh').classList.contains('hidden');
+      document.getElementById('unlocked-landmark-name').innerText = isZh ? data.name : data.nameEn;
+      document.getElementById('modal-badge-container').innerHTML = data.svgBadge;
+
+      if (typeof confetti === 'function') {
+        confetti({ particleCount: 75, spread: 65, origin: { y: 0.6 } });
+      }
+
+      document.getElementById('modal-celebration').classList.remove('hidden');
+    }
+
+    function goToFogUnlockPage(fromMission = false) {
+      document.getElementById('modal-celebration').classList.add('hidden');
+      switchPage('page-fog-unlock');
+      
+      if (fromMission || hasCompletedMission) {
+        document.getElementById('fog-overlay').classList.remove('hidden');
+      }
+    }
+
+    function switchMapMode(mode) {
+      const stdBtn = document.getElementById('map-mode-btn-standard');
+      const vrBtn = document.getElementById('map-mode-btn-vr');
+      const stdView = document.getElementById('map-view-standard');
+      const vrView = document.getElementById('map-view-vr');
+
+      if (mode === 'standard') {
+        stdBtn.className = "flex-1 py-1.5 rounded-lg bg-softGreen text-white transition-all text-center";
+        vrBtn.className = "flex-1 py-1.5 rounded-lg text-gray-600 hover:text-darkGreen transition-all text-center";
+        stdView.classList.remove('hidden');
+        vrView.classList.add('hidden');
+      } else {
+        vrBtn.className = "flex-1 py-1.5 rounded-lg bg-amber-600 text-white transition-all text-center";
+        stdBtn.className = "flex-1 py-1.5 rounded-lg text-gray-600 hover:text-darkGreen transition-all text-center";
+        vrView.classList.remove('hidden');
+        stdView.classList.add('hidden');
+      }
+    }
+
+    function clearFog() {
+      const overlay = document.getElementById('fog-overlay');
+      overlay.classList.add('fog-clearing');
+      
+      setTimeout(() => {
+        document.getElementById('progress-bar').style.width = '58%';
+        document.getElementById('progress-text').innerText = '58% (+16%)';
+      }, 500);
+    }
+
+    function filterRewards(category) {
+      document.querySelectorAll('.reward-tab-btn').forEach(btn => {
+        btn.className = "reward-tab-btn px-3 py-1 rounded-xl text-xs font-bold bg-white text-gray-600 border border-gray-200 transition shadow-xs whitespace-nowrap";
+      });
+      document.getElementById('tab-' + category).className = "reward-tab-btn px-3 py-1 rounded-xl text-xs font-bold bg-darkGreen text-white transition shadow-xs whitespace-nowrap";
+
+      document.querySelectorAll('.reward-card').forEach(card => {
+        if (category === 'all' || card.classList.contains(category)) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    function unlockBuddy(name, icon, perk, cost, btnId) {
+      if (currentTokens >= cost) {
+        currentTokens -= cost;
+        updateAllTokenDisplays();
+
+        unlockedBuddies.push({ name, icon, perk });
+        renderBuddySelectionList();
+
+        const btn = document.getElementById(btnId);
+        btn.innerText = "✓ 已解鎖";
+        btn.disabled = true;
+        btn.className = "w-full py-1.5 bg-gray-300 text-gray-600 text-xs font-bold rounded-xl cursor-not-allowed";
+
+        alert(`🎉 成功解鎖夥伴【${name}】！你現在可以隨時在「我的」頁面切換夥伴。`);
+      } else {
+        alert('Token 餘額不足！請先完成打卡任務累積 Token。');
+      }
+    }
+
+    function renderBuddySelectionList() {
+      const container = document.getElementById('buddy-selection-list');
+      container.innerHTML = unlockedBuddies.map(b => `
+        <button onclick="selectBuddy('${b.name}', '${b.icon}', '${b.perk}')" class="w-full p-2.5 bg-white hover:bg-amber-50 rounded-xl border border-gray-200 flex items-center gap-3 text-left transition shadow-xs">
+          <span class="text-3xl">${b.icon}</span>
+          <div>
+            <p class="font-extrabold text-xs text-gray-800">${b.name}</p>
+            <p class="text-[10px] text-amber-700 font-medium">特技: ${b.perk}</p>
+          </div>
+        </button>
+      `).join('');
+    }
+
+    function handleImageSelect(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          selectedImageBase64 = e.target.result;
+          document.getElementById('image-preview').src = selectedImageBase64;
+          document.getElementById('image-preview-container').classList.remove('hidden');
+          document.getElementById('image-attached-label').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function submitMemory() {
+      const text = document.getElementById('memory-input').value.trim();
+      if (!text) return;
+
+      const feed = document.getElementById('memories-list');
+      const data = landmarkDatabase[currentLandmarkIdx];
+      const isZh = !document.querySelector('.lang-zh').classList.contains('hidden');
+
+      const newPostHtml = `
+        <div class="bg-cardBg p-3 rounded-2xl border border-gray-100 shadow-sm badge-pop">
+          <div class="flex justify-between items-center mb-1.5">
+            <div class="flex items-center gap-2">
+              <span class="text-base">👦</span>
+              <div>
+                <p class="text-xs font-bold text-gray-800">小林 (探索家)</p>
+                <p class="text-[10px] text-gray-400">剛剛發佈</p>
+              </div>
+            </div>
+            <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md font-bold">✨ 最新探索</span>
+          </div>
+          <p class="text-xs text-gray-700 leading-relaxed mb-2">${text}</p>
+          ${selectedImageBase64 ? `<img src="${selectedImageBase64}" class="w-full h-32 object-cover rounded-xl mb-2">` : ''}
+          <div class="flex justify-between items-center text-[11px] text-gray-500 pt-1 border-t border-gray-100">
+            <button onclick="likePost(this)" class="hover:text-accentOrange flex items-center gap-1 font-semibold text-rose-500 bg-rose-50 px-2.5 py-0.5 rounded-full">
+              ❤️ <span>1</span>
+            </button>
+            <span>📍 ${isZh ? data.name : data.nameEn}</span>
+          </div>
+        </div>
+      `;
+
+      feed.insertAdjacentHTML('afterbegin', newPostHtml);
+      document.getElementById('memory-input').value = '';
+      document.getElementById('image-preview-container').classList.add('hidden');
+      document.getElementById('image-attached-label').classList.add('hidden');
+      selectedImageBase64 = null;
+    }
+
+    function likePost(btn) {
+      const countEl = btn.querySelector('span');
+      countEl.innerText = parseInt(countEl.innerText) + 1;
+    }
+
+    function redeemReward(title, cost) {
+      if (currentTokens >= cost) {
+        currentTokens -= cost;
+        updateAllTokenDisplays();
+        document.getElementById('qr-title').innerText = title;
+        document.getElementById('modal-qr').classList.remove('hidden');
+      } else {
+        alert('Token 餘額不足！請先完成打卡任務累積 Token。');
+      }
+    }
+
+    // Modal Helpers
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+    function openAllBadgesModal() { openModal('modal-all-badges'); }
+
+    function selectBuddy(fullName, icon, perk) {
+      document.getElementById('home-buddy-name').innerText = fullName;
+      document.getElementById('buddy-name-display').innerText = fullName;
+      document.getElementById('buddy-icon-display').innerText = icon;
+      document.getElementById('profile-buddy-badge').innerText = icon;
+      document.getElementById('buddy-perk-display').innerText = `❤️❤️❤️🤍🤍 (${perk})`;
+      closeModal('modal-buddy');
+    }
+
+    function equipTitle(title) {
+      document.getElementById('profile-equipped-title').innerText = title;
+      document.getElementById('home-equipped-title-tag').innerText = title.replace('【堅尼地城', '【').replace('【西環', '【').replace('【藝里坊', '【');
+      closeModal('modal-title');
+    }
+  </script>
+</body>
+</html>
