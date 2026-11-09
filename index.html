@@ -281,28 +281,9 @@
 </div>
 <!-- Simulated Full Image GPS Route Canvas -->
 <div class="relative flex-1 min-h-[360px] rounded-3xl overflow-hidden border-2 border-stone-700 shadow-2xl bg-stone-800 flex items-center justify-center">
-<!-- Background Real Street/Map View Simulation -->
-<img alt="Map Route View" class="absolute inset-0 w-full h-full object-cover filter brightness-75 contrast-110" id="gps-map-image" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800"/>
-<div class="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-900/30 to-stone-900/60 pointer-events-none"></div>
-<!-- Animated GPS Navigation SVG Path Overlay -->
-<svg class="absolute inset-0 w-full h-full pointer-events-none" viewbox="0 0 350 400">
-<!-- Paved Path Outline -->
-<path d="M 50 350 L 120 270 L 170 200 L 280 100" fill="none" stroke="#000000" stroke-linecap="round" stroke-opacity="0.4" stroke-width="14"></path>
-<path d="M 50 350 L 120 270 L 170 200 L 280 100" fill="none" stroke="#38BDF8" stroke-linecap="round" stroke-width="8"></path>
-<path class="animate-dash-walk" d="M 50 350 L 120 270 L 170 200 L 280 100" fill="none" stroke="#FFFFFF" stroke-dasharray="8 8" stroke-linecap="round" stroke-width="3"></path>
-<!-- Current User Location Marker -->
-<g transform="translate(50, 350)">
-<circle class="animate-ping" cx="0" cy="0" fill="#0284C7" fill-opacity="0.3" r="16"></circle>
-<circle cx="0" cy="0" fill="#38BDF8" r="10" stroke="#FFFFFF" stroke-width="3"></circle>
-<circle cx="0" cy="0" fill="#FFFFFF" r="4"></circle>
-</g>
-<!-- Destination Drop Pin Marker -->
-<g transform="translate(280, 85)">
-<circle class="animate-ping" cx="0" cy="0" fill="#F59E0B" fill-opacity="0.4" r="18"></circle>
-<path d="M 0 -18 C -7 -18 -12 -13 -12 -6 C -12 4 0 14 0 14 C 0 14 12 4 12 -6 C 12 -13 7 -18 0 -18 Z" fill="#EF4444" stroke="#FFFFFF" stroke-width="2"></path>
-<circle cx="0" cy="-6" fill="#FFFFFF" r="4"></circle>
-</g>
-</svg>
+<!-- Background Real Street/Map View Simulation (濾鏡與暗色遮罩已移除) -->
+<img alt="Map Route View" class="absolute inset-0 w-full h-full object-cover" id="gps-map-image" src="E49BFC4B-E6A5-4AC0-825E-41FDD7A6DADD.jpeg"/>
+
 <!-- Floating Compass Badge -->
 <div class="absolute top-4 right-4 bg-stone-900/80 backdrop-blur-md text-amber-400 p-2 rounded-full border border-stone-700 shadow-md">
             🧭
