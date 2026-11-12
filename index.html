@@ -152,6 +152,40 @@
 <!-- 圖片位置 1：首頁地圖相片。把圖片放在 HTML 同一個資料夾，然後把 src="main-page-map.jpg" 改成你的圖片檔案名稱。 --><img alt="首頁社區地圖相片" class="absolute inset-0 w-full h-full object-cover z-0" id="main-page-map-photo" onerror="this.style.display='none'" src="IMG_3512.jpeg"/><svg class="absolute inset-0 w-full h-full" fill="none" viewbox="0 0 350 290">
 
 </svg>
+<!-- 圖片切換按鈕：浮動在圖片右上角 -->
+<div class="absolute top-3 right-3 z-20 flex flex-col gap-2">
+
+    <button
+        onclick="changeBackground('IMG_3512.jpeg')"
+        class="px-3 py-2 rounded-lg bg-white/90 text-emerald-800 text-xs font-bold shadow">
+        🌅 背景
+    </button>
+
+    <button
+        onclick="changeOutfit('C05EBBD8-F70B-41EE-A1EB-518C922E41C5.png')"
+        class="px-3 py-2 rounded-lg bg-white/90 text-amber-800 text-xs font-bold shadow">
+        👕 預設服裝
+    </button>
+
+    <button
+        onclick="changeOutfit('9A6E30B4-9BEA-4DD6-A1C7-F75E4F6B0A6F.png')"
+        class="px-3 py-2 rounded-lg bg-white/90 text-amber-800 text-xs font-bold shadow">
+        ❄️ 冬季服裝
+    </button>
+
+    <button
+        onclick="showComingSoon()"
+        class="px-3 py-2 rounded-lg bg-white/90 text-stone-700 text-xs font-bold shadow">
+        🛍️ 更多服裝
+    </button>
+
+    <button
+        onclick="showToast('🐱 已選擇貓咪夥伴！')"
+        class="px-3 py-2 rounded-lg bg-white/90 text-orange-800 text-xs font-bold shadow">
+        🐱 貓咪夥伴
+    </button>
+
+</div>
 <!-- Floating Token Badge (As in Reference Image photo bottom-left overlay) -->
 <div class="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md rounded-2xl px-3 py-1.5 shadow-md border border-stone-200 flex items-center gap-2">
 <div class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-xs">
@@ -172,20 +206,7 @@
 <!-- 背景及角色服裝選擇 -->
 <!-- ================================== -->
 
-<div class="space-y-3 mt-4">
 
-    <!-- 更換背景照片 -->
-    <div class="bg-white rounded-xl p-3 border border-stone-200">
-        <p class="text-sm font-bold text-stone-700 mb-2">
-            🌅 更換背景照片
-        </p>
-
-        <button
-            onclick="changeBackground('IMG_3512.jpeg')"
-            class="px-4 py-2 rounded-xl bg-emerald-100 text-emerald-800 text-sm font-bold">
-            堅尼地城海旁日落
-        </button>
-    </div>
 
     <!-- 更換角色裝扮 -->
     <div class="bg-white rounded-xl p-3 border border-stone-200">
