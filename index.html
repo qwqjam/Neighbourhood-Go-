@@ -148,27 +148,34 @@
 <!-- Reference Image Style Hand-Drawn Neighborhood Map Container -->
 <div class="relative rounded-3xl bg-[#F4EFE0] border-2 border-[#E2DAC4] p-2 overflow-hidden shadow-sm">
 <div class="relative h-72 w-full rounded-2xl bg-[#F7F4E9] overflow-hidden flex items-center justify-center">
-<!-- SVG Hand-drawn Styled Neighborhood Map matching reference image -->
-<!-- 圖片位置 1：首頁地圖相片。把圖片放在 HTML 同一個資料夾，然後把 src="main-page-map.jpg" 改成你的圖片檔案名稱。 --><img alt="首頁社區地圖相片" class="absolute inset-0 w-full h-full object-cover z-0" id="main-page-map-photo" onerror="this.style.display='none'" src="IMG_3512.jpeg"/><svg class="absolute inset-0 w-full h-full" fill="none" viewbox="0 0 350 290">
+<img id="main-page-map-photo" alt="首頁社區地圖相片" src="C05EBBD8-F70B-41EE-A1EB-518C922E41C5.png" class="absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-200"/>
 
-</svg>
-<!-- Floating Token Badge (As in Reference Image photo bottom-left overlay) -->
+<!-- Token -->
 <div class="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md rounded-2xl px-3 py-1.5 shadow-md border border-stone-200 flex items-center gap-2">
-<div class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-xs">
-                ✓
-              </div>
+<div class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-xs">✓</div>
 <div>
 <div class="text-[9px] text-stone-500 font-bold uppercase tracking-wider">Token</div>
 <div class="text-sm font-black text-stone-900 leading-none global-tokens-display">260</div>
 </div>
 </div>
-<!-- Floating "Today Pick" Badge -->
-<div class="absolute top-3 right-3 bg-amber-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1">
-              ✨ 熱門地標
+
+<!-- 熱門地標 -->
+<div class="absolute top-3 right-3 bg-amber-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-sm">✨ 熱門地標</div>
+
+<!-- ★ 新增：右下角三個按鈕 -->
+<div class="absolute bottom-3 right-3 z-20 flex flex-col gap-1.5">
+<button id="cust-btn-clothing" onclick="openCustomize('clothing')" class="w-11 py-1 rounded-2xl bg-white/95 backdrop-blur-md border border-stone-200 shadow-md flex flex-col items-center leading-none"><span class="text-base">👕</span><span class="text-[9px] font-bold text-stone-600 mt-0.5">服裝</span></button>
+<button id="cust-btn-partner" onclick="openCustomize('partner')" class="w-11 py-1 rounded-2xl bg-white/95 backdrop-blur-md border border-stone-200 shadow-md flex flex-col items-center leading-none"><span class="text-base">🐾</span><span class="text-[9px] font-bold text-stone-600 mt-0.5">夥伴</span></button>
+<button id="cust-btn-background" onclick="openCustomize('background')" class="w-11 py-1 rounded-2xl bg-white/95 backdrop-blur-md border border-stone-200 shadow-md flex flex-col items-center leading-none"><span class="text-base">🌄</span><span class="text-[9px] font-bold text-stone-600 mt-0.5">背景</span></button>
 </div>
 </div>
+
+<!-- ★ 新增：選項列（按按鈕後在圖片下方展開） -->
+<div id="customize-panel" class="hidden mt-2 bg-white rounded-2xl border border-[#E2DAC4] p-2.5">
+<p id="customize-title" class="text-[11px] font-extrabold text-stone-600 mb-2"></p>
+<div id="customize-options" class="flex gap-2 overflow-x-auto no-scrollbar"></div>
 </div>
-<!-- Location Spotlight Details Box (Replaces grey box in image) -->
+</div>
 <div class="bg-white rounded-3xl p-3.5 border-2 border-[#EBE3CE] shadow-xs space-y-2">
 <div class="flex justify-between items-start">
 <div>
@@ -1293,7 +1300,96 @@ GPS 偵測已抵達附近 (點擊完成探索)
       closeModal('modal-title');
       showToast(`已佩戴稱號【${title}】`);
     }
+    // ===== 首頁形象設定：服裝 / 夥伴 / 背景 =====
+// 圖片放在 HTML 同一個資料夾。之後加新組合，只需改這個表
+const HERO_IMAGES = {
+  forest: {
+    default: 'C05EBBD8-F70B-41EE-A1EB-518C922E41C5.png',
+    winter:  '9A6E30B4-9BEA-4DD6-A1C7-F75E4F6B0A6F.png'
+  },
+  kennedy: {
+    default: 'IMG_3512.jpeg'
+    // winter: '有「冬季服裝＋海旁」圖片後在這裡加'
+  }
+};
 
+const CUSTOM_OPTIONS = {
+  clothing: { title: '服裝', items: [
+    { id: 'default', icon: '👕', label: '預設' },
+    { id: 'winter',  icon: '🧥', label: '冬季服裝' },
+    { id: 'more',    icon: '＋', label: '商店' }
+  ]},
+  partner: { title: '社區散步夥伴', items: [
+    { id: 'cat', icon: '🐈', label: '貓咪' }
+  ]},
+  background: { title: '背景', items: [
+    { id: 'forest',  icon: '🌲', label: '森林' },
+    { id: 'kennedy', icon: '🌅', label: '堅尼地城海旁日落' }
+  ]}
+};
+
+const avatarState = { clothing: 'default', partner: 'cat', background: 'forest' };
+let openedCustomize = null;
+
+function openCustomize(type) {
+  const panel = document.getElementById('customize-panel');
+  if (openedCustomize === type) {          // 再按同一粒 = 收起
+    openedCustomize = null;
+    panel.classList.add('hidden');
+  } else {
+    openedCustomize = type;
+    panel.classList.remove('hidden');
+    renderCustomizeOptions();
+  }
+  ['clothing', 'partner', 'background'].forEach(t => {
+    const on = t === openedCustomize;
+    const b = document.getElementById('cust-btn-' + t);
+    b.classList.toggle('ring-2', on);
+    b.classList.toggle('ring-amber-400', on);
+  });
+}
+
+function renderCustomizeOptions() {
+  const cfg = CUSTOM_OPTIONS[openedCustomize];
+  document.getElementById('customize-title').innerText = cfg.title;
+  document.getElementById('customize-options').innerHTML = cfg.items.map(it => {
+    const active = avatarState[openedCustomize] === it.id;
+    return `<button onclick="pickCustomize('${openedCustomize}','${it.id}')"
+      class="shrink-0 min-w-[64px] px-2.5 py-1.5 rounded-xl border-2 flex flex-col items-center gap-0.5 transition ${active ? 'border-amber-400 bg-amber-50' : 'border-stone-200 bg-stone-50'}">
+      <span class="text-xl leading-none">${it.icon}</span>
+      <span class="text-[10px] font-bold text-stone-700 whitespace-nowrap">${it.label}</span>
+    </button>`;
+  }).join('');
+}
+
+function pickCustomize(type, id) {
+  if (id === 'more') {
+    showToast('🛍️ 更多服裝將會在商店推出，敬請期待！');
+    return;
+  }
+  avatarState[type] = id;
+  if (type === 'partner') showToast('🐈 目前夥伴固定為貓咪');
+  renderCustomizeOptions();
+  applyHeroImage();
+}
+
+function applyHeroImage() {
+  const set = HERO_IMAGES[avatarState.background];
+  let next = set[avatarState.clothing];
+  if (!next) {                              // 這個組合未有圖 → 用預設服裝圖
+    next = set.default;
+    showToast('ℹ️ 這個背景暫時未有此服裝版本');
+  }
+  const img = document.getElementById('main-page-map-photo');
+  if (img.getAttribute('src') === next) return;
+  const pre = new Image();                  // 先預載，成功才換圖
+  pre.onload = () => {
+    img.style.opacity = 0;
+    setTimeout(() => { img.src = next; img.style.opacity = 1; }, 200);
+  };
+  pre.onerror = () => showToast('⚠️ 找不到圖片：' + next);
+  pre.src = next;
+}
     window.onload = function() {
       switchPage('page-home');
       updateAllTokenDisplays();
