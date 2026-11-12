@@ -150,62 +150,80 @@
 <div class="relative h-72 w-full rounded-2xl bg-[#F7F4E9] overflow-hidden flex items-center justify-center">
 <!-- MAIN PHOTO CUSTOMISATION AREA -->
 
-<!-- Background: Kennedy Town Sunset -->
-<img
-  alt="堅尼地城海旁日落"
-  class="absolute inset-0 w-full h-full object-cover z-0"
-  id="main-page-map-photo"
-  src="IMG_3512.jpeg"
->
-
-<!-- SVG Overlay -->
-<svg
-  class="absolute inset-0 w-full h-full pointer-events-none"
-  fill="none"
-  viewBox="0 0 350 290">
-</svg>
-
-<!-- Avatar: Default Clothing -->
-<img
-  id="home-avatar"
-  src="C05EBBD8-F70B-41EE-A1EB-518C922E41C5.png"
-  alt="My Avatar"
-  class="absolute bottom-1 left-1/2 -translate-x-1/2 h-44 w-auto object-contain z-10"
->
-
-<!-- Community Walking Buddy: Cat -->
+<!-- MAIN CUSTOMISATION SCENE FRAME -->
 <div
-  id="home-walking-buddy"
-  class="absolute bottom-3 right-5 text-4xl z-20"
+  id="home-scene-frame"
+  class="relative h-72 w-full rounded-2xl bg-[#F7F4E9] overflow-hidden flex items-center justify-center isolate"
 >
-  🐈
+  <!-- Layer 1: Background -->
+  <img
+    id="main-page-map-photo"
+    src="IMG_3512.jpeg"
+    alt="探索背景"
+    class="absolute inset-0 w-full h-full object-cover z-0"
+  >
+
+  <!-- Optional soft overlay for readability -->
+  <div class="absolute inset-0 bg-black/0 z-[1] pointer-events-none"></div>
+
+  <!-- Layer 2: Avatar -->
+  <img
+    id="home-avatar"
+    src="C05EBBD8-F70B-41EE-A1EB-518C922E41C5.png"
+    alt="My Avatar"
+    class="absolute bottom-1 left-1/2 -translate-x-1/2 h-44 w-auto object-contain z-10 pointer-events-none"
+  >
+
+  <!-- Layer 3: Walking Buddy -->
+  <div
+    id="home-walking-buddy"
+    class="absolute bottom-5 right-8 text-4xl z-20 pointer-events-none"
+  >
+    🐈
+  </div>
+
+  <!-- THREE CUSTOMISATION BUTTONS -->
+  <div class="absolute top-3 left-3 z-30 flex flex-col gap-2">
+    <button
+      onclick="openModal('modal-avatar-dressup')"
+      class="bg-white/95 px-3 py-2 rounded-xl shadow-md border border-amber-200 text-xs font-bold text-stone-800"
+    >
+      👕 角色換裝
+    </button>
+
+    <button
+      onclick="openModal('modal-background')"
+      class="bg-white/95 px-3 py-2 rounded-xl shadow-md border border-emerald-200 text-xs font-bold text-stone-800"
+    >
+      🏞️ 背景更換
+    </button>
+
+    <button
+      onclick="openModal('modal-buddy')"
+      class="bg-white/95 px-3 py-2 rounded-xl shadow-md border border-sky-200 text-xs font-bold text-stone-800"
+    >
+      🐈 社區散步夥伴
+    </button>
+  </div>
+
+  <!-- Floating Token Badge -->
+  <div class="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md rounded-2xl px-3 py-1.5 shadow-md border border-stone-200 flex items-center gap-2 z-30">
+    <div class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-xs">
+      ✓
+    </div>
+    <div>
+      <div class="text-[9px] text-stone-500 font-bold uppercase tracking-wider">Token</div>
+      <div class="text-sm font-black text-stone-900 leading-none global-tokens-display">260</div>
+    </div>
+  </div>
+
+  <!-- Floating "Today Pick" Badge -->
+  <div class="absolute top-3 right-3 bg-amber-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1 z-30">
+    ✨ 熱門地標
+  </div>
 </div>
 
-<!-- THREE CUSTOMISATION BUTTONS -->
-<div class="absolute top-3 left-3 z-30 flex flex-col gap-2">
 
-  <button
-    onclick="openModal('modal-avatar-dressup')"
-    class="bg-white/95 px-3 py-2 rounded-xl shadow-md border border-amber-200 text-xs font-bold text-stone-800"
-  >
-    👕 角色換裝
-  </button>
-
-  <button
-    onclick="openModal('modal-background')"
-    class="bg-white/95 px-3 py-2 rounded-xl shadow-md border border-emerald-200 text-xs font-bold text-stone-800"
-  >
-    🏞️ 背景更換
-  </button>
-
-  <button
-    onclick="openModal('modal-buddy')"
-    class="bg-white/95 px-3 py-2 rounded-xl shadow-md border border-sky-200 text-xs font-bold text-stone-800"
-  >
-    🐈 社區散步夥伴
-  </button>
-
-</div>
 <!-- Floating Token Badge (As in Reference Image photo bottom-left overlay) -->
 <div class="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md rounded-2xl px-3 py-1.5 shadow-md border border-stone-200 flex items-center gap-2">
 <div class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-xs">
@@ -1444,17 +1462,34 @@ GPS 偵測已抵達附近 (點擊完成探索)
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
     function openAllBadgesModal() { openModal('modal-all-badges'); }
     // Change avatar clothing
-function changeHomeAvatar(imageFile) {
+const homeSceneState = {
+  avatar: 'C05EBBD8-F70B-41EE-A1EB-518C922E41C5.png',
+  background: 'IMG_3512.jpeg',
+  buddyIcon: '🐈'
+};
 
+function renderHomeScene() {
+  const background = document.getElementById('main-page-map-photo');
   const avatar = document.getElementById('home-avatar');
+  const buddy = document.getElementById('home-walking-buddy');
 
-  if (!avatar) return;
+  if (background) background.src = homeSceneState.background;
+  if (avatar) avatar.src = homeSceneState.avatar;
+  if (buddy) buddy.innerText = homeSceneState.buddyIcon;
+}
 
-  avatar.src = imageFile;
-
+function changeHomeAvatar(imageFile) {
+  homeSceneState.avatar = imageFile;
+  renderHomeScene();
   closeModal('modal-avatar-dressup');
-
   showToast('✨ 角色服裝更換成功！');
+}
+
+function changeHomeBackground(imageFile) {
+  homeSceneState.background = imageFile;
+  renderHomeScene();
+  closeModal('modal-background');
+  showToast('🌅 背景更換成功！');
 }
 
 
@@ -1472,16 +1507,29 @@ function changeHomeBackground(imageFile) {
   showToast('🌅 背景更換成功！');
 }
     function selectBuddy(fullName, icon, perk) {
+  homeSceneState.buddyIcon = icon;
+  renderHomeScene();
 
-  document.getElementById('home-buddy-icon-badge').innerText = icon;
+  const badge = document.getElementById('home-buddy-icon-badge');
+  if (badge) badge.innerText = icon;
 
-  // Update cat/companion in the main photo area
-  const sceneBuddy = document.getElementById('home-walking-buddy');
+  const buddyName = document.getElementById('buddy-name-display');
+  if (buddyName) buddyName.innerText = fullName;
 
-  if (sceneBuddy) {
-    sceneBuddy.innerText = icon;
+  const buddyIconDisplay = document.getElementById('buddy-icon-display');
+  if (buddyIconDisplay) buddyIconDisplay.innerText = icon;
+
+  const profileBadge = document.getElementById('profile-buddy-badge');
+  if (profileBadge) profileBadge.innerText = icon;
+
+  const perkDisplay = document.getElementById('buddy-perk-display');
+  if (perkDisplay) {
+    perkDisplay.innerText = `❤️❤️❤️🤍🤍 (${perk})`;
   }
 
+  closeModal('modal-buddy');
+  showToast(`已切換夥伴為 ${fullName}`);
+}
   document.getElementById('buddy-name-display').innerText = fullName;
 
   document.getElementById('buddy-icon-display').innerText = icon;
