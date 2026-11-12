@@ -1,17 +1,21 @@
 <!DOCTYPE html>
-
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Neighbourhood Go! 鄰里 Go!</title>
-<!-- Tailwind CSS -->
-<script src="https://cdn.tailwindcss.com"></script>
-<!-- FontAwesome 6 Icons -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-<!-- Canvas Confetti -->
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-<script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Neighbourhood Go! 鄰里 Go!</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    rel="stylesheet"
+  />
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
     tailwind.config = {
       theme: {
         extend: {
@@ -22,23 +26,33 @@
             darkGreen: '#5C7A2D',
             accentOrange: '#F59E0B',
             brandOrange: '#FF8A3D',
-            lightGreen: '#E2ECC8',
-            fogDark: 'rgba(15, 23, 18, 0.94)'
+            lightGreen: '#E2ECC8'
           },
           fontFamily: {
-            sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'PingFang TC', 'Microsoft JhengHei', 'sans-serif'],
+            sans: [
+              'system-ui',
+              '-apple-system',
+              'BlinkMacSystemFont',
+              'Segoe UI',
+              'Roboto',
+              'PingFang TC',
+              'Microsoft JhengHei',
+              'sans-serif'
+            ]
           }
         }
       }
-    }
+    };
   </script>
-<style>
+
+  <style>
     body {
       background-color: #dce7ca;
       background-image: radial-gradient(#8fa963 0.8px, #e3ebd2 0.8px);
       background-size: 16px 16px;
       font-family: system-ui, -apple-system, sans-serif;
     }
+
     .phone-container {
       width: 390px;
       height: 780px;
@@ -51,6 +65,7 @@
       flex-direction: column;
       position: relative;
     }
+
     @media (max-width: 420px) {
       .phone-container {
         width: 100vw;
@@ -59,6 +74,7 @@
         border: none;
       }
     }
+
     .page {
       display: none;
       flex: 1;
@@ -67,1118 +83,1352 @@
       -webkit-overflow-scrolling: touch;
       padding-bottom: 75px;
     }
+
     .page.active {
       display: flex;
     }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* Keyframe Animations */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
     @keyframes pulseGlow {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.85); }
-      70% { transform: scale(1.08); box-shadow: 0 0 0 18px rgba(245, 158, 11, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.85);
+      }
+      70% {
+        transform: scale(1.04);
+        box-shadow: 0 0 0 18px rgba(245, 158, 11, 0);
+      }
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+      }
     }
-    .pulse-glow { animation: pulseGlow 2s infinite; }
 
-    @keyframes fogDissolve {
-      0% { opacity: 0.95; filter: blur(8px); }
-      100% { opacity: 0; filter: blur(0px); visibility: hidden; }
+    .pulse-glow {
+      animation: pulseGlow 2s infinite;
     }
-    .fog-clearing { animation: fogDissolve 1.6s forwards ease-out; }
 
     @keyframes badgePop {
-      0% { transform: scale(0.3) rotate(-15deg); opacity: 0; }
-      70% { transform: scale(1.12) rotate(5deg); opacity: 1; }
-      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+      0% {
+        transform: scale(0.3) rotate(-8deg);
+        opacity: 0;
+      }
+      70% {
+        transform: scale(1.08) rotate(3deg);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
     }
-    .badge-pop { animation: badgePop 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
-    @keyframes dashWalk {
-      0% { strokeDashoffset: 24; }
-      100% { strokeDashoffset: 0; }
+    .badge-pop {
+      animation: badgePop 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     }
-    .animate-dash-walk { animation: dashWalk 1.5s linear infinite; }
 
-    .pin-bounce {
-      animation: pinBounce 2s infinite ease-in-out;
-    }
-    @keyframes pinBounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
+    .scene-button {
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
     }
   </style>
 </head>
+
 <body class="min-h-screen flex justify-center items-center p-0 sm:p-2">
-<!-- Mobile Phone Frame Container -->
-<div class="phone-container">
-<!-- Toast Notification Message Banner -->
-<div class="absolute top-4 left-1/2 -translate-x-1/2 bg-gray-900/90 text-white text-xs font-bold px-4 py-2 rounded-2xl shadow-xl z-50 hidden transition-all flex items-center gap-2 border border-white/20" id="toast-notification">
-<span id="toast-icon">✨</span>
-<span id="toast-message">Notification message</span>
-</div>
-<!-- ========== TAB 1: HOME (首頁 - Enhanced layout matching image_de9922.jpg) ========== -->
-<div class="page active" id="page-home">
-<div class="p-3 flex flex-col gap-3 flex-1 overflow-y-auto no-scrollbar bg-[#FAF8EE]">
-<!-- Header Bar: Back Arrow + Title + User Avatar & Weather -->
-<div class="flex justify-between items-center px-1 pt-1">
-<div class="flex items-center gap-2">
-<button class="w-9 h-9 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-700 shadow-xs hover:bg-stone-50" onclick="switchPage('page-profile')">
-<i class="fa-solid fa-arrow-left text-sm"></i>
-</button>
-<h1 class="font-extrabold text-xl text-stone-900 tracking-tight flex items-center gap-1.5">
-              Neighborhood Go!
+
+  <div class="phone-container">
+
+    <!-- Toast -->
+    <div
+      id="toast-notification"
+      class="absolute top-4 left-1/2 -translate-x-1/2 bg-gray-900/90 text-white text-xs font-bold px-4 py-2 rounded-2xl shadow-xl z-[999] hidden flex items-center gap-2 border border-white/20"
+    >
+      <span id="toast-icon">✨</span>
+      <span id="toast-message">Notification</span>
+    </div>
+
+    <!-- HOME PAGE -->
+    <div class="page active" id="page-home">
+      <div class="p-3 flex flex-col gap-3 flex-1 overflow-y-auto no-scrollbar bg-[#FAF8EE]">
+
+        <!-- Header -->
+        <div class="flex justify-between items-center px-1 pt-1">
+          <div class="flex items-center gap-2">
+            <button
+              class="w-9 h-9 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-700 shadow-sm"
+              onclick="switchPage('page-profile')"
+            >
+              <i class="fa-solid fa-arrow-left text-sm"></i>
+            </button>
+
+            <h1 class="font-extrabold text-xl text-stone-900 tracking-tight leading-tight">
+              Neighborhood<br />Go!
             </h1>
-</div>
-<div class="flex items-center gap-2">
-<!-- Weather Widget -->
-<div class="bg-white border border-stone-200 rounded-full py-1 px-2.5 shadow-xs flex items-center gap-1.5">
-<span class="text-base">🌤️</span>
-<span class="text-xs font-black text-stone-800">26°C</span>
-</div>
-<!-- EN/繁 Switcher -->
-
-<!-- User Avatar Icon (Clickable -> Profile) -->
-<div class="cursor-pointer relative w-9 h-9 rounded-full bg-amber-100 border-2 border-amber-400 flex items-center justify-center overflow-hidden shadow-xs" onclick="switchPage('page-profile')">
-<img src="IMG_3512.jpeg" alt="User Profile" class="w-full h-full object-cover rounded-full">
-<span class="absolute -bottom-1 -right-1 text-[10px]" id="home-buddy-icon-badge">🐈</span>
-</div>
-</div>
-</div>
-<!-- Reference Image Style Hand-Drawn Neighborhood Map Container -->
-<div class="relative rounded-3xl bg-[#F4EFE0] border-2 border-[#E2DAC4] p-2 overflow-hidden shadow-sm">
-<div class="relative h-72 w-full rounded-2xl bg-[#F7F4E9] overflow-hidden flex items-center justify-center">
-<!-- MAIN PHOTO CUSTOMISATION AREA -->
-
-<!-- MAIN CUSTOMISATION SCENE FRAME -->
-<div
-  id="home-scene-frame"
-  class="relative h-72 w-full rounded-2xl bg-[#F7F4E9] overflow-hidden flex items-center justify-center isolate"
->
-  <!-- Layer 1: Background -->
-  <img
-    id="main-page-map-photo"
-    src="IMG_3512.jpeg"
-    alt="探索背景"
-    class="absolute inset-0 w-full h-full object-cover z-0"
-  >
-
-  <!-- Optional soft overlay for readability -->
-  <div class="absolute inset-0 bg-black/0 z-[1] pointer-events-none"></div>
-
-  <!-- Layer 2: Avatar -->
-  <img
-    id="home-avatar"
-    src="C05EBBD8-F70B-41EE-A1EB-518C922E41C5.png"
-    alt="My Avatar"
-    class="absolute bottom-1 left-1/2 -translate-x-1/2 h-44 w-auto object-contain z-10 pointer-events-none"
-  >
-
-  <!-- Layer 3: Walking Buddy -->
-  <div
-    id="home-walking-buddy"
-    class="absolute bottom-5 right-8 text-4xl z-20 pointer-events-none"
-  >
-    🐈
-  </div>
-
-  <!-- THREE CUSTOMISATION BUTTONS -->
-  <div class="absolute top-3 left-3 z-30 flex flex-col gap-2">
-    <button
-      onclick="openModal('modal-avatar-dressup')"
-      class="bg-white/95 px-3 py-2 rounded-xl shadow-md border border-amber-200 text-xs font-bold text-stone-800"
-    >
-      👕 角色換裝
-    </button>
-
-    <button
-      onclick="openModal('modal-background')"
-      class="bg-white/95 px-3 py-2 rounded-xl shadow-md border border-emerald-200 text-xs font-bold text-stone-800"
-    >
-      🏞️ 背景更換
-    </button>
-
-    <button
-      onclick="openModal('modal-buddy')"
-      class="bg-white/95 px-3 py-2 rounded-xl shadow-md border border-sky-200 text-xs font-bold text-stone-800"
-    >
-      🐈 社區散步夥伴
-    </button>
-  </div>
-
-  <!-- Floating Token Badge -->
-  <div class="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md rounded-2xl px-3 py-1.5 shadow-md border border-stone-200 flex items-center gap-2 z-30">
-    <div class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-xs">
-      ✓
-    </div>
-    <div>
-      <div class="text-[9px] text-stone-500 font-bold uppercase tracking-wider">Token</div>
-      <div class="text-sm font-black text-stone-900 leading-none global-tokens-display">260</div>
-    </div>
-  </div>
-
-  <!-- Floating "Today Pick" Badge -->
-  <div class="absolute top-3 right-3 bg-amber-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1 z-30">
-    ✨ 熱門地標
-  </div>
-</div>
-
-
-<!-- Floating Token Badge (As in Reference Image photo bottom-left overlay) -->
-<div class="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md rounded-2xl px-3 py-1.5 shadow-md border border-stone-200 flex items-center gap-2">
-<div class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-xs">
-                ✓
-              </div>
-<div>
-<div class="text-[9px] text-stone-500 font-bold uppercase tracking-wider">Token</div>
-<div class="text-sm font-black text-stone-900 leading-none global-tokens-display">260</div>
-</div>
-</div>
-<!-- Floating "Today Pick" Badge -->
-<div class="absolute top-3 right-3 bg-amber-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1">
-              ✨ 熱門地標
-</div>
-</div>
-</div>
-<!-- Location Spotlight Details Box (Replaces grey box in image) -->
-<div class="bg-white rounded-3xl p-3.5 border-2 border-[#EBE3CE] shadow-xs space-y-2">
-<div class="flex justify-between items-start">
-<div>
-<div class="flex items-center gap-1.5 text-xs text-amber-800 font-bold">
-                📍 <span id="target-district">堅尼地城</span>
-<span class="text-stone-300">•</span>
-<span class="text-stone-600 font-medium truncate max-w-[170px]" id="target-tags">海景、日落、質感Café</span>
-</div>
-<h3 class="font-black text-base text-stone-900 leading-tight mt-0.5" id="target-title">
-                堅尼地城海旁日落角
-              </h3>
-</div>
-<button class="text-xs text-stone-700 hover:text-darkGreen font-extrabold flex items-center gap-1 bg-stone-100 px-2.5 py-1 rounded-xl transition shrink-0" onclick="randomizeLocation()">
-              🎲 隨機切換
-</button>
-</div>
-<p class="text-xs text-stone-600 font-medium line-clamp-2 leading-relaxed" id="target-desc">
-            位於港島西端海濱，是香港最著名的日落海景勝地之一。遠眺維港夕陽餘暉與海天一色勝景。
-          </p>
-<div class="flex justify-between items-center text-[11px] text-stone-500 pt-1 border-t border-stone-100">
-<span>🚶 預計 300m · 步行 4 分鐘</span>
-<span class="text-emerald-700 font-extrabold bg-emerald-50 px-2 py-0.5 rounded-md">+30 Token 獎勵</span>
-</div>
-</div>
-<!-- Prominent Main Action Button: 開始探索 (Matching Green Pill Button in Reference Image) -->
-<div class="mt-auto pt-1">
-<button class="w-full py-3.5 bg-[#7A9A3B] hover:bg-[#5C7A2D] text-white font-black text-lg rounded-2xl shadow-lg transition-all border-2 border-[#8FA963] flex items-center justify-center gap-2 active:scale-95" onclick="openExplorationStartModal()">
-<span>🚀</span>
-開始探索
-
-</button>
-</div>
-</div>
-</div>
-<!-- ========== TAB 2: LOCATION DETAIL (地點詳情頁) ========== -->
-<div class="page" id="page-detail">
-<div class="p-4 flex flex-col gap-3 flex-1 overflow-y-auto no-scrollbar">
-<div class="flex items-center justify-between">
-<button class="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-700 shadow-xs" onclick="switchPage('page-home')">
-<i class="fa fa-arrow-left"></i>
-</button>
-<h2 class="font-bold text-stone-800 text-sm truncate max-w-[200px]" id="detail-header-title">堅尼地城海旁日落角</h2>
-<button class="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-darkGreen shadow-xs" onclick="randomizeLocation()">
-<i class="fa fa-refresh"></i>
-</button>
-</div>
-<div class="bg-cardBg rounded-2xl p-3 border border-lightGreen shadow-sm space-y-2.5">
-<div class="relative h-44 rounded-xl overflow-hidden border border-stone-200">
-<img alt="Hero" class="w-full h-full object-cover" id="detail-image" src="IMG_3512.jpeg"/>
-<div class="absolute top-2 right-2 bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs">
-              ☀️ 晴朗適宜散步
-</div>
-</div>
-<div class="flex justify-between items-center text-xs text-stone-600 pb-1.5 border-b border-stone-100">
-<span>🏷️ 興趣: <strong class="text-stone-800" id="detail-tags">海景、日落、攝影、質感Café</strong></span>
-<span class="text-[11px] bg-lightGreen text-darkGreen px-2.5 py-0.5 rounded-full font-bold">
-最近打卡: <span id="detail-checkin-count">42</span>人
-</span>
-</div>
-<p class="text-xs text-stone-700 leading-relaxed whitespace-pre-line" id="detail-full-desc">
-【地點背景】位於港島西端海濱，是香港最著名的日落海景勝地之一。遠眺維港夕陽餘暉、青洲燈塔與海天一色勝景。
-【周邊特色地點】堅尼地城海濱長廊、卑路乍灣公園、堅尼地城籃球場、沿海質感 Café 與老字號茶餐廳。
-          </p>
-<div class="bg-amber-50/90 p-2.5 rounded-xl border border-amber-200 flex justify-between items-center">
-<span class="text-xs font-bold text-stone-700">
-完成任務可獲得
-</span>
-<span class="text-lg font-black text-darkGreen" id="detail-reward-text">+30 Token</span>
-</div>
-<!-- Companion Mode Selector -->
-<div>
-<p class="text-[11px] font-bold text-stone-600 mb-1.5">
-選擇探索模式 (結伴同行獎勵加成):
-
-</p>
-<div class="grid grid-cols-2 gap-2">
-<button class="py-2 px-3 rounded-xl border-2 border-softGreen bg-lightGreen text-darkGreen text-xs font-bold flex items-center justify-center gap-1 transition-all" id="mode-solo" onclick="selectMode('solo')">
-                👤 獨自前來 (1.0x)
-</button>
-<button class="py-2 px-3 rounded-xl border border-stone-200 bg-white text-stone-600 text-xs font-bold flex items-center justify-center gap-1 transition-all" id="mode-duo" onclick="selectMode('duo')">
-                👥 結伴同行 (1.5x)
-</button>
-</div>
-</div>
-<!-- Check-in Action -->
-<button class="w-full py-3 bg-softGreen hover:bg-darkGreen text-white font-bold text-sm rounded-xl shadow-md transition-all flex justify-center items-center gap-2 border border-white/40" onclick="startGpsNavigation()">
-            📍 啟動 GPS 導航前往
-</button>
-</div>
-</div>
-</div>
-<!-- ========== SCREEN: SIMULATED GPS MAP DIRECTION SCREEN ========== -->
-<div class="page" id="page-gps-sim">
-<div class="p-3 flex flex-col gap-3 flex-1 overflow-y-auto no-scrollbar relative bg-stone-900 text-white">
-<!-- Navigation Top HUD Bar -->
-<div class="flex justify-between items-center bg-stone-800/90 backdrop-blur-md p-3 rounded-2xl border border-stone-700">
-<button class="w-8 h-8 rounded-full bg-stone-700 text-stone-300 flex items-center justify-center text-xs" onclick="switchPage('page-home')">
-            ✕
-          </button>
-<div class="text-center">
-<h3 class="font-extrabold text-sm text-white flex items-center gap-1" id="gps-target-name">
-              📍 堅尼地城海旁日落角
-            </h3>
-<p class="text-[11px] text-amber-400 font-bold" id="gps-target-step">沿吉席街步行 300 米 ➔ 目的地</p>
-</div>
-<div class="text-right text-xs">
-<div class="font-black text-emerald-400">300m</div>
-<div class="text-[10px] text-stone-400">步行 4 分</div>
-</div>
-</div>
-<!-- Simulated Full Image GPS Route Canvas -->
-<div class="relative flex-1 min-h-[360px] rounded-3xl overflow-hidden border-2 border-stone-700 shadow-2xl bg-stone-800 flex items-center justify-center">
-<!-- Background Real Street/Map View Simulation -->
-<img alt="Map Route View" class="absolute inset-0 w-full h-full object-cover" id="gps-map-image" src="E49BFC4B-E6A5-4AC0-825E-41FDD7A6DADD.jpeg"/>
-
-<!-- Floating Compass Badge -->
-<div class="absolute top-4 right-4 bg-stone-900/80 backdrop-blur-md text-amber-400 p-2 rounded-full border border-stone-700 shadow-md">
-            🧭
           </div>
-<!-- Bottom Floating Action Button: GPS Detected Spot -->
-<div class="absolute bottom-4 inset-x-4">
-<button class="w-full py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black text-sm rounded-2xl shadow-2xl transition-all border-2 border-emerald-300 flex justify-center items-center gap-2 pulse-glow active:scale-95" onclick="triggerGpsArrivalCheckin()">
-<span>📍</span>
-GPS 偵測已抵達附近 (點擊完成探索)
 
-</button>
-</div>
-</div>
-</div>
-</div>
-<!-- ========== TAB 3: MAP & VR (地圖) ========== -->
-<div class="page" id="page-fog-unlock">
-<div class="p-4 flex flex-col gap-3 flex-1 overflow-y-auto no-scrollbar relative">
-<header class="text-center my-1">
-<h2 class="font-extrabold text-lg text-stone-800 flex items-center justify-center gap-1.5">
-            🗺️ 社區地圖與 VR 探索
-</h2>
-<p class="text-xs text-stone-500 font-medium">
-預覽西區迷霧區塊與 1970 復古街景
+          <div class="flex items-center gap-2">
+            <div class="bg-white border border-stone-200 rounded-full py-1 px-2.5 shadow-sm flex items-center gap-1.5">
+              <span class="text-base">🌤️</span>
+              <span class="text-xs font-black text-stone-800">26°C</span>
+            </div>
 
-</p>
-</header>
-<!-- Mode Toggle -->
-<div class="bg-white p-1 rounded-xl border border-stone-200 flex text-xs font-bold shadow-xs">
-<button class="flex-1 py-1.5 rounded-lg bg-softGreen text-white transition-all text-center" id="map-mode-btn-standard" onclick="switchMapMode('standard')">
-            🗺️ 社區地圖
-</button>
-<button class="flex-1 py-1.5 rounded-lg text-stone-600 hover:text-darkGreen transition-all text-center" id="map-mode-btn-vr" onclick="switchMapMode('vr')">
-            👓 1970 舊香港 VR
-</button>
-</div>
-<!-- Dynamic Exploration Progress -->
-<div class="bg-cardBg p-3 rounded-2xl border border-lightGreen shadow-sm">
-<div class="flex justify-between items-center text-xs font-bold mb-1">
-<span class="text-darkGreen">
-西區社區探索度
-</span>
-<span class="text-accentOrange text-sm font-black" id="progress-text">42%</span>
-</div>
-<div class="w-full h-3 bg-stone-200 rounded-full overflow-hidden">
-<div class="h-full bg-accentOrange transition-all duration-1000" id="progress-bar" style="width: 42%;"></div>
-</div>
-</div>
-<!-- STANDARD MAP VIEW CONTAINER -->
-<div class="relative h-80 rounded-2xl overflow-hidden border-2 border-darkGreen shadow-md bg-[#1d3d4b]" id="map-view-standard">
-
-  <img
-    alt="社區地圖相片"
-    class="absolute inset-0 w-full h-full object-cover"
-    id="community-map-photo"
-    src="IMG_3576.jpeg"
-    onerror="this.style.display='none'"
-  >
-
-</div>
-<!-- 1970s VR OLD HK CONTAINER -->
-<div class="relative h-80 rounded-2xl overflow-hidden border-2 border-amber-600 shadow-md hidden bg-amber-950" id="map-view-vr">
-<!-- 圖片位置 3：1970 年代地圖／VR 相片。可把 src 改成例如 "1970-map.jpg"。 --><img alt="1970s VR Street" class="w-full h-full object-cover filter sepia contrast-125 brightness-90" src="images.jpeg"/>
-<div class="absolute inset-0 bg-amber-900/30 backdrop-sepia-50 pointer-events-none"></div>
-<div class="absolute top-2 left-2 bg-amber-900/80 backdrop-blur-xs text-amber-200 border border-amber-500/50 text-[10px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-xs">
-<span>👓 360° 1970s Old Hong Kong VR</span>
-</div>
-<div class="absolute bottom-4 left-6 bg-amber-100 text-amber-900 px-3 py-1.5 rounded-xl border border-amber-400 text-xs font-bold shadow-lg flex items-center gap-2">
-<span>🚃 叮叮車復古老街景 (1976)</span>
-</div>
-</div>
-<button class="w-full py-3 bg-softGreen hover:bg-darkGreen text-white font-bold text-xs rounded-xl shadow-md transition-all mt-1" onclick="switchPage('page-memories')">
-查看社區記憶與寫下感想 →
-
-</button>
-</div>
-</div>
-<!-- ========== TAB 4: REWARD STORE (獎勵商店) ========== -->
-<div class="page" id="page-rewards">
-<div class="p-4 flex flex-col gap-3 flex-1 overflow-y-auto no-scrollbar">
-<header class="flex justify-between items-center bg-cardBg p-3 rounded-2xl border border-lightGreen shadow-sm">
-<div class="flex items-center gap-2">
-<span class="text-2xl">🎁</span>
-<div>
-<h2 class="font-extrabold text-sm text-stone-800">
-鄰里優惠與獎勵商店
-</h2>
-<p class="text-[10px] text-stone-500">
-西環合作店家特約折扣與夥伴解鎖
-</p>
-</div>
-</div>
-<div class="bg-lightGreen/80 px-2.5 py-1 rounded-xl text-xs font-bold text-darkGreen">
-            🪙 <span class="global-tokens-display">260</span> Token
+            <div
+              class="cursor-pointer relative w-9 h-9 rounded-full bg-amber-100 border-2 border-amber-400 flex items-center justify-center overflow-hidden shadow-sm"
+              onclick="switchPage('page-profile')"
+            >
+              <img
+                src="IMG_3512.jpeg"
+                alt="User Profile"
+                class="w-full h-full object-cover rounded-full"
+                onerror="this.style.display='none'"
+              >
+              <span
+                id="home-buddy-icon-badge"
+                class="absolute -bottom-1 -right-1 text-[10px]"
+              >
+                🐈
+              </span>
+            </div>
           </div>
-</header>
-<!-- Category Filter Tabs -->
-<div class="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-<button class="reward-tab-btn px-3 py-1 rounded-xl text-xs font-bold bg-darkGreen text-white transition shadow-xs whitespace-nowrap" id="tab-all" onclick="filterRewards('all')">
-            ✨ 全部
-</button>
-<button class="reward-tab-btn px-3 py-1 rounded-xl text-xs font-bold bg-white text-stone-600 border border-stone-200 transition shadow-xs whitespace-nowrap" id="tab-coupons" onclick="filterRewards('coupons')">
-            🎫 店家優惠券
-</button>
-<button class="reward-tab-btn px-3 py-1 rounded-xl text-xs font-bold bg-white text-stone-600 border border-stone-200 transition shadow-xs whitespace-nowrap" id="tab-buddies" onclick="filterRewards('buddies')">
-            🐾 散步夥伴
-</button>
-<button class="reward-tab-btn px-3 py-1 rounded-xl text-xs font-bold bg-white text-stone-600 border border-stone-200 transition shadow-xs whitespace-nowrap" id="tab-gear" onclick="filterRewards('gear')">
-            ⛑️ 頭像裝飾
-</button>
-</div>
-<!-- Reward Items Grid -->
-<div class="grid grid-cols-2 gap-2.5">
-<div class="reward-card coupons bg-cardBg p-3 rounded-2xl border border-lightGreen text-center flex flex-col justify-between shadow-xs">
-<div>
-<div class="w-12 h-12 mx-auto bg-amber-100 rounded-2xl flex items-center justify-center text-2xl mb-1.5 border border-amber-200">
-                ☕
-              </div>
-<h4 class="font-bold text-xs text-stone-800">
-西環小店咖啡優惠券
-</h4>
-<p class="text-[10px] text-stone-500 mt-0.5 font-medium">憑券折抵 HK$15</p>
-</div>
-<div class="mt-2.5 pt-2 border-t border-stone-100">
-<span class="text-xs font-extrabold text-amber-600 block mb-1">80 Token</span>
-<button class="w-full py-1.5 bg-softGreen hover:bg-darkGreen text-white text-xs font-bold rounded-xl transition shadow-xs" onclick="redeemReward('西環咖啡折價券', 80)">
-兌換
-</button>
-</div>
-</div>
-<div class="reward-card buddies bg-cardBg p-3 rounded-2xl border border-lightGreen text-center flex flex-col justify-between shadow-xs">
-<div>
-<div class="w-12 h-12 mx-auto bg-emerald-100 rounded-2xl flex items-center justify-center text-2xl mb-1.5 border border-emerald-200">
-                🚃
-              </div>
-<h4 class="font-bold text-xs text-stone-800">
-丁丁電車精靈 (夥伴)
-</h4>
-<p class="text-[10px] text-emerald-700 mt-0.5 font-bold">古蹟任務 Token +10%</p>
-</div>
-<div class="mt-2.5 pt-2 border-t border-stone-100">
-<span class="text-xs font-extrabold text-amber-600 block mb-1">100 Token</span>
-<button class="w-full py-1.5 bg-darkGreen hover:bg-softGreen text-white text-xs font-bold rounded-xl transition shadow-xs" id="unlock-btn-tram" onclick="unlockBuddy('丁丁電車精靈 🚃', '🚃', '+10% 復古景點 Token', 100, 'unlock-btn-tram')">
-解鎖夥伴
-</button>
-</div>
-</div>
-<div class="reward-card buddies bg-cardBg p-3 rounded-2xl border border-lightGreen text-center flex flex-col justify-between shadow-xs">
-<div>
-<div class="w-12 h-12 mx-auto bg-sky-100 rounded-2xl flex items-center justify-center text-2xl mb-1.5 border border-sky-200">
-                🕊️
-              </div>
-<h4 class="font-bold text-xs text-stone-800">
-海旁海鷗 (夥伴)
-</h4>
-<p class="text-[10px] text-sky-700 mt-0.5 font-bold">海邊打卡額外 +10 Token</p>
-</div>
-<div class="mt-2.5 pt-2 border-t border-stone-100">
-<span class="text-xs font-extrabold text-amber-600 block mb-1">120 Token</span>
-<button class="w-full py-1.5 bg-darkGreen hover:bg-softGreen text-white text-xs font-bold rounded-xl transition shadow-xs" id="unlock-btn-gull" onclick="unlockBuddy('海旁海鷗 🕊️', '🕊️', '海邊打卡額外 +10 Token', 120, 'unlock-btn-gull')">
-解鎖夥伴
-</button>
-</div>
-</div>
-<div class="reward-card gear bg-cardBg p-3 rounded-2xl border border-lightGreen text-center flex flex-col justify-between shadow-xs">
-<div>
-<div class="w-12 h-12 mx-auto bg-rose-100 rounded-2xl flex items-center justify-center text-2xl mb-1.5 border border-rose-200">
-                ⛑️
-              </div>
-<h4 class="font-bold text-xs text-stone-800">
-可愛冒險安全帽
-</h4>
-<p class="text-[10px] text-stone-500 mt-0.5 font-medium">個人造型頭飾</p>
-</div>
-<div class="mt-2.5 pt-2 border-t border-stone-100">
-<span class="text-xs font-extrabold text-amber-600 block mb-1">30 Token</span>
-<button class="w-full py-1.5 bg-softGreen hover:bg-darkGreen text-white text-xs font-bold rounded-xl transition shadow-xs" onclick="redeemReward('可愛冒險安全帽', 30)">
-兌換
-</button>
-</div>
-</div>
-</div>
-</div>
-</div>
-<!-- ========== SCREEN 6: COMMUNITY MEMORIES WALL ========== -->
-<div class="page" id="page-memories">
-<div class="p-4 flex flex-col gap-3 flex-1 overflow-y-auto no-scrollbar">
-<div class="flex items-center justify-between">
-<button class="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-700 shadow-xs" onclick="switchPage('page-home')">
-<i class="fa fa-arrow-left"></i>
-</button>
-<h2 class="font-bold text-stone-800 text-sm">
-社區記憶與舊街故事
-</h2>
-<div class="w-8"></div>
-</div>
-<div class="bg-cardBg p-3.5 rounded-2xl border border-lightGreen shadow-sm space-y-2.5">
-<h3 class="font-bold text-xs text-darkGreen flex items-center gap-1.5">
-            ✏️ 留下你對這個地方的感想與照片 (如: 懷舊回憶)
+        </div>
 
-</h3>
-<textarea class="w-full p-2.5 text-xs bg-white border border-stone-200 rounded-xl focus:outline-none focus:border-softGreen text-stone-700 resize-none" id="memory-input" placeholder="寫下對這裡的感想或童年懷舊回憶..." rows="3"></textarea>
-<div class="flex justify-between items-center pt-1 border-t border-stone-100">
-<label class="cursor-pointer bg-lightGreen/70 text-darkGreen text-[11px] px-2.5 py-1 rounded-lg border border-lightGreen font-extrabold flex items-center gap-1 hover:bg-lightGreen">
-              📷 附上照片
-<input accept="image/*" class="hidden" id="image-upload" onchange="handleImageSelect(event)" type="file"/>
-</label>
-<button class="px-4 py-1.5 bg-darkGreen text-white text-xs font-bold rounded-lg hover:bg-softGreen transition-all shadow-xs" onclick="submitMemory()">
-發佈感想
-</button>
-</div>
-</div>
-<div class="flex flex-col gap-2.5" id="memories-list">
-<div class="bg-cardBg p-3 rounded-2xl border border-stone-100 shadow-sm">
-<div class="flex justify-between items-center mb-1.5">
-<div class="flex items-center gap-2">
-<span class="text-base">👵</span>
-<div>
-<p class="text-xs font-bold text-stone-800">陳奶奶 (西環老街坊)</p>
-<p class="text-[10px] text-stone-400">1970年代口述 · 2小時前</p>
-</div>
-</div>
-<span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md font-bold">📖 懷舊回憶</span>
-</div>
-<p class="text-xs text-stone-700 leading-relaxed mb-2">
-              以前這裏還沒改建的時候，小時候下課總會跟同學在海邊看船隻駛過，轉眼間幾十年過去了，日落的景致依然非常有溫度。
-            </p>
-<div class="flex justify-between items-center text-[11px] text-stone-400 border-t border-stone-100 pt-1">
-<span>❤️ 24 人覺得暖心</span>
-<span>📍 堅尼地城海旁</span>
-</div>
-</div>
-</div>
-</div>
-</div>
-<!-- ========== TAB 5: PROFILE (我的頁面 - 100% COMPLETE 6-SECTION MANDATORY STRUCTURE) ========== -->
-<div class="page" id="page-profile">
-<!-- SECTION 1: TOP NAVIGATION BAR -->
-<div class="bg-[#BED39A] pt-3 pb-2 px-4 flex justify-between items-center text-stone-800 border-b border-[#B1C88B] shrink-0">
-<button class="hover:text-darkGreen transition text-stone-700 font-bold text-base" onclick="switchPage('page-home')">
-<i class="fa-solid fa-chevron-left"></i>
-</button>
-<span class="font-extrabold text-base tracking-wide text-stone-800">Neighbourhood Go!</span>
-<button class="text-stone-700 font-bold hover:opacity-80 text-base" onclick="openModal('modal-title')">
-<i class="fa-solid fa-plus"></i>
-</button>
-</div>
-<!-- SECTION 2: NATURE FOREST HILLS HEADER BACKGROUND & USER PROFILE & STATS -->
-<div class="relative bg-gradient-to-b from-[#BED39A] via-[#CDDCAB] to-[#FDFBF4] pt-4 pb-6 px-4 text-center overflow-hidden border-b border-[#C5DCAB] shrink-0">
-<!-- SVG Hills, Trees, Floating Yellow Flowers & Sparkles Background -->
-<!-- 圖片位置 4：個人頭像。把相片放在 HTML 同一個資料夾，並修改 src="profile-photo.jpg"。 --><img alt="個人頭像" class="absolute inset-1 w-[calc(100%-8px)] h-[calc(100%-8px)] rounded-full object-cover z-20" onerror="this.style.display='none'" src="profile-photo.jpg"/><svg class="absolute inset-0 w-full h-full opacity-60 pointer-events-none" fill="none" viewbox="0 0 390 240">
-<path d="M-30 180 C40 90, 130 110, 180 170 Z" fill="#9CB86F"></path>
-<path d="M210 180 C260 100, 360 105, 420 180 Z" fill="#5C7A2D"></path>
-<path d="M-10 200 Q90 130, 220 190 Z" fill="#8FA963"></path>
-<circle cx="45" cy="115" fill="#5C7A2D" r="14"></circle>
-<circle cx="340" cy="110" fill="#8FA963" r="16"></circle>
-<g fill="#FDE047">
-<circle cx="48" cy="65" r="5"></circle>
-<circle cx="42" cy="65" r="4"></circle>
-<circle cx="54" cy="65" r="4"></circle>
-<circle cx="48" cy="59" r="4"></circle>
-<circle cx="48" cy="71" r="4"></circle>
-<circle cx="48" cy="65" fill="#FEF08A" r="3"></circle>
-<circle cx="325" cy="52" r="5"></circle>
-<circle cx="319" cy="52" r="4"></circle>
-<circle cx="331" cy="52" r="4"></circle>
-<circle cx="325" cy="46" r="4"></circle>
-<circle cx="325" cy="58" r="4"></circle>
-<circle cx="325" cy="52" fill="#FEF08A" r="3"></circle>
-<polygon points="115,85 117,90 122,90 118,93 120,98 115,95 110,98 112,93 108,90 113,90"></polygon>
-<polygon points="275,70 277,75 282,75 278,78 280,83 275,80 270,83 272,78 268,75 273,75"></polygon>
-</g>
-</svg>
-<!-- Circular Avatar Illustration with Dark Green Border Ring (#8FA963) -->
-<div class="relative w-24 h-24 mx-auto mb-2 z-10">
-<div class="w-full h-full rounded-full bg-[#FFFDF5] border-4 border-[#8FA963] p-1 shadow-md overflow-hidden flex items-center justify-center">
-  <!-- ADD YOUR IMAGE HERE -->
-  <img src="IMG_3512.jpeg" alt="Profile Avatar" class="w-full h-full object-cover rounded-full">
-</div>
-<div class="absolute -bottom-1 -right-1 bg-white border-2 border-amber-400 w-8 h-8 rounded-full flex items-center justify-center text-base shadow-sm" id="profile-buddy-badge">
-            🐈
-          </div>
-</div>
-<!-- Username '小林' & Level Badge 'Lv.6' & Subtitle '社區新手' -->
-<div class="flex flex-col items-center justify-center gap-1 mb-3 relative z-10">
-<div class="flex items-center gap-2">
-<h3 class="font-extrabold text-xl text-stone-900 tracking-tight leading-none">小林</h3>
-<span class="bg-amber-300 border border-amber-400 text-amber-950 text-xs font-black px-2 py-0.5 rounded-full shadow-xs">
-              Lv.6
-            </span>
-</div>
-<p class="text-xs text-stone-600 font-bold cursor-pointer hover:underline" id="profile-equipped-title" onclick="openModal('modal-title')">社區新手</p>
-</div>
-<!-- Floating 3-Column White Stats Card (外出: 12, 造訪: 8, 行走: 46) -->
-<div class="bg-white rounded-3xl p-3.5 border-2 border-[#EBE3CE] shadow-md grid grid-cols-3 divide-x divide-stone-200 relative z-10 mx-1 mt-1">
-<div class="text-center px-1">
-<p class="text-xs text-stone-600 font-bold mb-1">
-外出
-</p>
-<p class="font-black text-lg text-amber-800 leading-none">12</p>
-<p class="text-[10px] text-stone-500 font-bold mt-0.5">
-12 次
-</p>
-</div>
-<div class="text-center px-1">
-<p class="text-xs text-stone-600 font-bold mb-1">
-造訪
-</p>
-<p class="font-black text-lg text-amber-800 leading-none">8</p>
-<p class="text-[10px] text-stone-500 font-bold mt-0.5">
-8 個地點
-</p>
-</div>
-<div class="text-center px-1">
-<p class="text-xs text-stone-600 font-bold mb-1">
-行走
-</p>
-<p class="font-black text-lg text-amber-800 leading-none">46</p>
-<p class="text-[10px] text-stone-500 font-bold mt-0.5">
-46 km
-</p>
-</div>
-</div>
-</div>
-<!-- PROFILE BODY CONTENT SECTIONS 3 TO 6 -->
-<div class="p-4 space-y-4">
-<!-- SECTION 3: COMMUNITY EXPLORATION PROGRESS WALL -->
-<div class="bg-[#FFFDF5] p-3.5 rounded-3xl border-2 border-[#EBE3CE] shadow-sm space-y-2.5">
-<div class="flex justify-between items-center">
-<h4 class="font-extrabold text-xs text-stone-800 flex items-center gap-1.5">
-<span class="text-darkGreen font-bold text-sm">🌎</span>
-社區探索進度度量牆
-</h4>
-<span class="text-xs font-black text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-300">
-總解鎖 58%
-</span>
-</div>
-<div class="space-y-2 text-xs">
-<div>
-<div class="flex justify-between text-[11px] font-bold mb-1">
-<span class="text-stone-700">🌊 堅尼地城 (堅尼地城)</span>
-<span class="text-darkGreen font-extrabold">72%</span>
-</div>
-<div class="w-full h-2.5 bg-stone-200 rounded-full overflow-hidden">
-<div class="h-full bg-softGreen rounded-full" style="width: 72%;"></div>
-</div>
-</div>
-<div>
-<div class="flex justify-between text-[11px] font-bold mb-1">
-<span class="text-stone-700">🏛️ 西營盤 (西營盤)</span>
-<span class="text-amber-600 font-extrabold">45%</span>
-</div>
-<div class="w-full h-2.5 bg-stone-200 rounded-full overflow-hidden">
-<div class="h-full bg-amber-500 rounded-full" style="width: 45%;"></div>
-</div>
-</div>
-<div>
-<div class="flex justify-between text-[11px] font-bold mb-1">
-<span class="text-stone-700">⛵ 石塘咀 (石塘咀)</span>
-<span class="text-sky-600 font-extrabold">20%</span>
-</div>
-<div class="w-full h-2.5 bg-stone-200 rounded-full overflow-hidden">
-<div class="h-full bg-sky-500 rounded-full" style="width: 20%;"></div>
-</div>
-</div>
-</div>
-</div>
-<!-- SECTION 4: COMMUNITY WALKING BUDDY CARD -->
-<div class="bg-cardBg p-3.5 rounded-2xl border border-lightGreen shadow-sm space-y-2">
-<div class="flex justify-between items-center">
-<div class="flex items-center gap-2">
-<span class="text-xl">🐾</span>
-<div>
-<h4 class="font-extrabold text-xs text-stone-800">
-社區散步夥伴
-</h4>
-<p class="text-[10px] text-stone-500 font-medium">
-同行數步可獲得額外 Token 加成
+        <!-- Main Scene Card -->
+        <div class="relative rounded-3xl bg-[#F4EFE0] border-2 border-[#E2DAC4] p-2 overflow-hidden shadow-sm">
 
-</p>
-</div>
-</div>
-<button class="text-[11px] bg-lightGreen text-darkGreen font-bold px-2.5 py-1 rounded-xl hover:bg-softGreen hover:text-white transition shadow-xs" onclick="openModal('modal-buddy')">
-更換夥伴
-</button>
-</div>
-<div class="bg-white p-2.5 rounded-xl border border-stone-100 flex items-center gap-3">
-<div class="w-12 h-12 bg-amber-50 rounded-2xl border border-amber-200 flex items-center justify-center text-2xl shadow-xs" id="buddy-icon-display">
+          <!-- 
+            IMPORTANT:
+            This is the fixed scene.
+            Background, avatar, and buddy are separated into different layers.
+          -->
+          <div
+            id="home-scene-frame"
+            class="relative h-72 w-full rounded-2xl bg-[#F7F4E9] overflow-hidden flex items-center justify-center isolate"
+          >
+            <!-- Layer 1: Background only -->
+            <img
+              id="main-page-map-photo"
+              src="IMG_3512.jpeg"
+              alt="探索背景"
+              class="absolute inset-0 w-full h-full object-cover z-0"
+              onerror="this.style.display='none'"
+            >
+
+            <!-- Slight warm overlay -->
+            <div class="absolute inset-0 bg-amber-50/5 z-[1] pointer-events-none"></div>
+
+            <!-- Layer 2: Avatar only -->
+            <!-- 
+              This avatar is set by JavaScript to a transparent SVG.
+              If you replace it with your own image, make sure it is a transparent PNG.
+              Do NOT use a full background image here.
+            -->
+            <img
+              id="home-avatar"
+              src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+              alt="My Avatar"
+              class="absolute bottom-1 left-1/2 -translate-x-1/2 h-44 w-auto object-contain z-10 pointer-events-none drop-shadow-md"
+            >
+
+            <!-- Layer 3: Buddy -->
+            <div
+              id="home-walking-buddy"
+              class="absolute bottom-6 right-8 text-4xl z-20 pointer-events-none drop-shadow-md"
+            >
               🐈
             </div>
-<div class="flex-1">
-<div class="flex justify-between items-center mb-0.5">
-<h5 class="font-bold text-xs text-stone-800" id="buddy-name-display">西環巷仔貓 (Cat)</h5>
-<span class="text-[10px] text-rose-500 font-extrabold">親密度 Lv.3</span>
-</div>
-<p class="text-[10px] text-amber-700 font-semibold mb-1" id="buddy-perk-display">❤️❤️❤️🤍🤍 (+5% Token 散步獎勵)</p>
-<div class="w-full h-1.5 bg-stone-100 rounded-full overflow-hidden">
-<div class="h-full bg-rose-400 w-3/5 rounded-full"></div>
-</div>
-</div>
-</div>
-</div>
-<!-- SECTION 5: ACHIEVEMENT BADGES SECTION -->
-<div class="space-y-3">
-<div class="flex items-center justify-center my-3">
-<div class="h-0.5 bg-stone-300 flex-1"></div>
-<span class="px-4 text-xs font-black text-stone-700 tracking-wider">
-成就徽章
-</span>
-<div class="h-0.5 bg-stone-300 flex-1"></div>
-</div>
-<div class="grid grid-cols-3 gap-3">
-<!-- Badge 1: 首次打卡 -->
-<div class="flex flex-col items-center cursor-pointer group" onclick="openAllBadgesModal()">
-<div class="w-20 h-24 relative flex items-center justify-center transition transform group-hover:scale-105">
-<svg class="w-full h-full" viewbox="0 0 100 120">
-<path d="M 22 80 L 15 108 L 32 98 L 48 108 L 42 80 Z" fill="#E1523D"></path>
-<path d="M 78 80 L 85 108 L 68 98 L 52 108 L 58 80 Z" fill="#C43B27"></path>
-<path d="M50 5 L58 16 L72 10 L74 25 L88 26 L83 40 L95 48 L86 59 L93 72 L78 76 L78 91 L64 88 L50 96 L36 88 L22 91 L22 76 L7 72 L14 59 L5 48 L17 40 L12 26 L26 25 L28 10 L42 16 Z" fill="#F8C245" stroke="#E98A3D" stroke-width="3"></path>
-<circle cx="50" cy="48" fill="#E87B32" r="32"></circle>
-<circle cx="50" cy="48" fill="#FFFDF5" r="26" stroke="#FCE7F3" stroke-width="2"></circle>
-<path d="M50 30 C42 30 36 36 36 44 C36 54 50 66 50 66 C50 66 64 54 64 44 C64 36 58 30 50 30 Z" fill="#F97316"></path>
-<circle cx="50" cy="42" fill="#FFFFFF" r="5"></circle>
-</svg>
-</div>
-<p class="text-xs font-extrabold text-stone-800 mt-1">
-首次打卡
-</p>
-</div>
-<!-- Badge 2: 舊街探索 -->
-<div class="flex flex-col items-center cursor-pointer group" onclick="openAllBadgesModal()">
-<div class="w-20 h-24 relative flex items-center justify-center transition transform group-hover:scale-105">
-<svg class="w-full h-full" viewbox="0 0 100 120">
-<path d="M 22 80 L 15 108 L 32 98 L 48 108 L 42 80 Z" fill="#728E43"></path>
-<path d="M 78 80 L 85 108 L 68 98 L 52 108 L 58 80 Z" fill="#506929"></path>
-<circle cx="50" cy="48" fill="#FFFDF5" r="38" stroke="#8FA963" stroke-width="4"></circle>
-<path d="M 18 52 C 12 34, 30 16, 50 16 C 70 16, 88 34, 82 52" fill="none" stroke="#5C7A2D" stroke-linecap="round" stroke-width="4"></path>
-<path d="M 22 36 Q 16 30, 24 26 Q 30 32, 22 36 Z" fill="#728E43"></path>
-<path d="M 78 36 Q 84 30, 76 26 Q 70 32, 78 36 Z" fill="#728E43"></path>
-<rect fill="#8FA963" height="20" rx="2" width="28" x="36" y="44"></rect>
-<polygon fill="#E98A3D" points="32,44 50,30 68,44"></polygon>
-<rect fill="#FFFFFF" height="12" width="10" x="45" y="52"></rect>
-</svg>
-</div>
-<p class="text-xs font-extrabold text-stone-800 mt-1">
-舊街探索
-</p>
-</div>
-<!-- Badge 3: 結伴同行 -->
-<div class="flex flex-col items-center cursor-pointer group" onclick="openAllBadgesModal()">
-<div class="w-20 h-24 relative flex items-center justify-center transition transform group-hover:scale-105">
-<svg class="w-full h-full" viewbox="0 0 100 120">
-<path d="M 22 80 L 15 108 L 32 98 L 48 108 L 42 80 Z" fill="#E59C39"></path>
-<path d="M 78 80 L 85 108 L 68 98 L 52 108 L 58 80 Z" fill="#C57E20"></path>
-<circle cx="50" cy="20" fill="#F8D399" r="14"></circle>
-<circle cx="78" cy="40" fill="#F8D399" r="14"></circle>
-<circle cx="68" cy="72" fill="#F8D399" r="14"></circle>
-<circle cx="32" cy="72" fill="#F8D399" r="14"></circle>
-<circle cx="22" cy="40" fill="#F8D399" r="14"></circle>
-<circle cx="50" cy="48" fill="#FFEDD5" r="32" stroke="#E98A3D" stroke-width="3"></circle>
-<polygon fill="#D97706" points="34,44 50,32 66,44"></polygon>
-<rect fill="#B45309" height="18" rx="2" width="24" x="38" y="44"></rect>
-<rect fill="#FEF3C7" height="12" width="8" x="46" y="50"></rect>
-</svg>
-</div>
-<p class="text-xs font-extrabold text-stone-800 mt-1">
-結伴同行
-</p>
-</div>
-</div>
-</div>
-<!-- SECTION 6: RECENT FOOTPRINTS LOG -->
-<div class="pt-2 border-t border-stone-200/80">
-<h5 class="text-xs font-extrabold text-stone-700 mb-2 flex items-center gap-1.5">
-<span class="text-softGreen font-bold">🐾</span>
-近期探索足跡
-</h5>
-<div class="space-y-1.5 text-[11px] text-stone-600">
-<div class="bg-cardBg p-2.5 rounded-xl border border-lightGreen flex justify-between items-center shadow-xs">
-<span>📍 堅尼地城海旁日落角 (打卡成功)</span>
-<span class="text-darkGreen font-extrabold">+30 Token</span>
-</div>
-<div class="bg-cardBg p-2.5 rounded-xl border border-lightGreen flex justify-between items-center shadow-xs">
-<span>📍 西區社區中心 (二級歷史建築)</span>
-<span class="text-darkGreen font-extrabold">+45 Token</span>
-</div>
-</div>
-</div>
-</div>
-</div>
-<!-- ========== MODALS ========== -->
-<!-- Step 1 Pop-up Modal: Start Exploration (Description & Mode Selection) -->
-<div class="absolute inset-0 bg-black/70 backdrop-blur-xs z-40 hidden flex justify-center items-center p-4" id="modal-exploration-start">
-<div class="bg-cardBg border-2 border-softGreen rounded-3xl p-4 w-full max-w-xs shadow-2xl space-y-3 badge-pop">
-<div class="flex justify-between items-start border-b border-stone-200 pb-2">
-<div>
-<span class="text-[10px] bg-amber-100 text-amber-900 border border-amber-300 font-bold px-2 py-0.5 rounded-md">📍 地點探索</span>
-<h3 class="font-extrabold text-base text-stone-900 mt-1" id="modal-start-title">堅尼地城海旁日落角</h3>
-</div>
-<button class="w-6 h-6 rounded-full bg-stone-200 text-stone-600 font-bold text-xs" onclick="closeModal('modal-exploration-start')">✕</button>
-</div>
-<div class="h-32 rounded-xl overflow-hidden border border-stone-200">
-<img alt="Exploration Target" class="w-full h-full object-cover" id="modal-start-img" src="IMG_3512.jpeg"/>
-</div>
-<p class="text-xs text-stone-600 font-medium leading-relaxed max-h-24 overflow-y-auto no-scrollbar" id="modal-start-desc">
-          位於港島西端海濱，是香港最著名的日落海景勝地之一。遠眺維港夕陽餘暉、青洲燈塔與海天一色勝景。
-        </p>
-<!-- Companion Mode Selector -->
-<div class="bg-stone-50 p-2.5 rounded-xl border border-stone-200 space-y-1.5">
-<p class="text-[11px] font-bold text-stone-700">選擇同行模式 (Companion Mode):</p>
-<div class="grid grid-cols-2 gap-2">
-<button class="py-2 px-2 rounded-lg border-2 border-softGreen bg-lightGreen text-darkGreen text-[11px] font-bold flex items-center justify-center gap-1 transition-all" id="modal-mode-solo" onclick="selectMode('solo')">
-              👤 獨自前往 (1.0x)
-            </button>
-<button class="py-2 px-2 rounded-lg border border-stone-200 bg-white text-stone-600 text-[11px] font-bold flex items-center justify-center gap-1 transition-all" id="modal-mode-duo" onclick="selectMode('duo')">
-              👥 結伴同行 (1.5x)
-            </button>
-</div>
-</div>
-<button class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-extrabold text-sm rounded-xl shadow-md transition-all flex justify-center items-center gap-2" onclick="startGpsNavigation()">
-<span>🚀</span>
-開始導航前往
-</button>
-</div>
-</div>
-<!-- Celebration / Check-in Badge Pop Modal -->
-<div class="absolute inset-0 bg-black/70 backdrop-blur-xs z-40 hidden flex justify-center items-center p-4" id="modal-celebration">
-<div class="bg-cardBg border-4 border-amber-300 rounded-3xl p-5 text-center shadow-2xl w-full max-w-xs badge-pop relative overflow-hidden">
-<div class="text-4xl mb-1">🎉</div>
-<h3 class="font-black text-lg text-stone-800">
-地標解鎖成功！
-</h3>
-<p class="text-xs text-darkGreen font-bold mb-2" id="unlocked-landmark-name">堅尼地城海旁日落角</p>
-<div class="w-24 h-24 mx-auto my-1 relative flex items-center justify-center" id="modal-badge-container"></div>
-<div class="bg-amber-100/90 rounded-2xl p-2.5 my-2.5 border border-amber-200">
-<p class="text-[11px] text-amber-900 font-bold">
-獲得探索獎勵
-</p>
-<p class="text-xl font-black text-brandOrange" id="modal-token-amount">+30 Token</p>
-</div>
-<button class="w-full py-3 bg-darkGreen hover:bg-softGreen text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-1" onclick="goToMemoriesFromBadge()">
-<span>✏️</span>
-寫下感想與查看社區記憶 →
 
-</button>
-</div>
-</div>
-<!-- All Badges Modal -->
-<div class="absolute inset-0 bg-black/60 backdrop-blur-xs z-40 hidden flex justify-center items-center p-3" id="modal-all-badges">
-<div class="bg-cardBg rounded-3xl p-4 w-full max-w-sm max-h-[85vh] overflow-y-auto no-scrollbar shadow-2xl border-2 border-softGreen space-y-3">
-<div class="flex justify-between items-center border-b border-stone-200 pb-2">
-<h3 class="font-black text-sm text-stone-800 flex items-center gap-1.5">🏆 社區成就徽章冊 (4/12 已解鎖)</h3>
-<button class="w-6 h-6 rounded-full bg-stone-200 text-stone-600 font-bold text-xs" onclick="closeModal('modal-all-badges')">✕</button>
-</div>
-<div class="grid grid-cols-2 gap-2">
-<div class="bg-white p-2 rounded-xl border border-emerald-400 text-center">
-<p class="font-bold text-xs">首次打卡</p>
-<span class="text-[10px] text-emerald-600 font-bold">✓ 已解鎖</span>
-</div>
-<div class="bg-white p-2 rounded-xl border border-emerald-400 text-center">
-<p class="font-bold text-xs">舊街探索</p>
-<span class="text-[10px] text-emerald-600 font-bold">✓ 已解鎖</span>
-</div>
-<div class="bg-white p-2 rounded-xl border border-emerald-400 text-center">
-<p class="font-bold text-xs">結伴同行</p>
-<span class="text-[10px] text-emerald-600 font-bold">✓ 已解鎖</span>
-</div>
-<div class="bg-white p-2 rounded-xl border border-stone-200 text-center opacity-70">
-<p class="font-bold text-xs">西環落日</p>
-<span class="text-[10px] text-stone-400 font-bold">未解鎖</span>
-</div>
-</div>
-</div>
-</div>
-<!-- Companion Buddy Selector Modal -->
-<div class="absolute inset-0 bg-black/60 backdrop-blur-xs z-40 hidden flex justify-center items-center p-4" id="modal-buddy">
-<div class="bg-cardBg rounded-3xl p-4 w-full max-w-xs shadow-2xl border-2 border-softGreen space-y-3">
-<div class="flex justify-between items-center border-b border-stone-200 pb-2">
-<h3 class="font-black text-sm text-stone-800">🐾 選擇你的散步夥伴</h3>
-<button class="w-6 h-6 rounded-full bg-stone-200 text-stone-600 font-bold text-xs" onclick="closeModal('modal-buddy')">✕</button>
-</div>
-<div class="space-y-2" id="buddy-selection-list">
-<button class="w-full p-2.5 bg-white rounded-xl border border-stone-200 flex items-center gap-3 text-left" onclick="selectBuddy('西環巷仔貓 🐈', '🐈', '散步額外 +5% Token')">
-<span class="text-3xl">🐈</span>
-<div>
-<p class="font-extrabold text-xs text-stone-800">西環巷仔貓 (Cat)</p>
-<p class="text-[10px] text-amber-700">特技: 散步額外 +5% Token</p>
-</div>
-</button>
-</div>
-</div>
-</div>
-<!-- Title Selector Modal -->
-<div class="absolute inset-0 bg-black/60 backdrop-blur-xs z-40 hidden flex justify-center items-center p-4" id="modal-title">
-<div class="bg-cardBg rounded-3xl p-4 w-full max-w-xs shadow-2xl border-2 border-softGreen space-y-3">
-<div class="flex justify-between items-center border-b border-stone-200 pb-2">
-<h3 class="font-black text-sm text-stone-800">🏷️ 佩戴你的社區稱號</h3>
-<button class="w-6 h-6 rounded-full bg-stone-200 text-stone-600 font-bold text-xs" onclick="closeModal('modal-title')">✕</button>
-</div>
-<div class="space-y-2">
-<button class="w-full p-2.5 bg-amber-50 rounded-xl border border-amber-300 text-left font-bold text-xs text-amber-900" onclick="equipTitle('社區新手')">
-            🏷️ 【社區新手】 (已解鎖)
+            <!-- Three Buttons -->
+            <div class="absolute top-3 left-3 z-30 flex flex-col gap-2">
+              <button
+                onclick="openModal('modal-avatar-dressup')"
+                class="scene-button px-3 py-2 rounded-xl border border-amber-200 text-xs font-bold text-stone-800"
+              >
+                👕 角色換裝
+              </button>
+
+              <button
+                onclick="openModal('modal-background')"
+                class="scene-button px-3 py-2 rounded-xl border border-emerald-200 text-xs font-bold text-stone-800"
+              >
+                🏞️ 背景更換
+              </button>
+
+              <button
+                onclick="openModal('modal-buddy')"
+                class="scene-button px-3 py-2 rounded-xl border border-sky-200 text-xs font-bold text-stone-800"
+              >
+                🐈 社區散步夥伴
+              </button>
+            </div>
+
+            <!-- Hot Spot Badge -->
+            <div class="absolute top-3 right-3 bg-amber-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1 z-30">
+              ✨ 熱門地標
+            </div>
+
+            <!-- Token Badge -->
+            <div class="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md rounded-2xl px-3 py-1.5 shadow-md border border-stone-200 flex items-center gap-2 z-30">
+              <div class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-sm">
+                ✓
+              </div>
+              <div>
+                <div class="text-[9px] text-stone-500 font-bold uppercase tracking-wider">Token</div>
+                <div class="text-sm font-black text-stone-900 leading-none global-tokens-display">260</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Location Info -->
+        <div class="bg-white rounded-3xl p-3.5 border-2 border-[#EBE3CE] shadow-sm space-y-2">
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="flex items-center gap-1.5 text-xs text-amber-800 font-bold">
+                📍 <span id="target-district">堅尼地城</span>
+                <span class="text-stone-300">•</span>
+                <span class="text-stone-600 font-medium truncate max-w-[170px]" id="target-tags">
+                  海景、日落、質感Café
+                </span>
+              </div>
+
+              <h3
+                id="target-title"
+                class="font-black text-base text-stone-900 leading-tight mt-0.5"
+              >
+                堅尼地城海旁日落角
+              </h3>
+            </div>
+
+            <button
+              class="text-xs text-stone-700 hover:text-darkGreen font-extrabold flex items-center gap-1 bg-stone-100 px-2.5 py-1 rounded-xl transition shrink-0"
+              onclick="randomizeLocation()"
+            >
+              🎲 隨機切換
+            </button>
+          </div>
+
+          <p
+            id="target-desc"
+            class="text-xs text-stone-600 font-medium line-clamp-2 leading-relaxed"
+          >
+            位於港島西端海濱，是香港著名的日落海景勝地之一。遠眺維港夕陽餘暉與海天一色勝景。
+          </p>
+
+          <div class="flex justify-between items-center text-[11px] text-stone-500 pt-1 border-t border-stone-100">
+            <span>🚶 預計 300m · 步行 4 分鐘</span>
+            <span class="text-emerald-700 font-extrabold bg-emerald-50 px-2 py-0.5 rounded-md">
+              +30 Token 獎勵
+            </span>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="mt-auto pt-1">
+          <button
+            class="w-full py-3.5 bg-[#7A9A3B] hover:bg-[#5C7A2D] text-white font-black text-lg rounded-2xl shadow-lg transition-all border-2 border-[#8FA963] flex items-center justify-center gap-2 active:scale-95"
+            onclick="openExplorationStartModal()"
+          >
+            <span>🚀</span>
+            開始探索
           </button>
-<button class="w-full p-2.5 bg-emerald-50 rounded-xl border border-emerald-300 text-left font-bold text-xs text-emerald-900" onclick="equipTitle('堅尼地城日落大使')">
-            🏷️ 【堅尼地城日落大使】 (已解鎖)
+        </div>
+
+      </div>
+    </div>
+
+    <!-- GPS PAGE -->
+    <div class="page" id="page-gps-sim">
+      <div class="p-3 flex flex-col gap-3 flex-1 overflow-y-auto no-scrollbar relative bg-stone-900 text-white">
+
+        <div class="flex justify-between items-center bg-stone-800/90 backdrop-blur-md p-3 rounded-2xl border border-stone-700">
+          <button
+            class="w-8 h-8 rounded-full bg-stone-700 text-stone-300 flex items-center justify-center text-xs"
+            onclick="switchPage('page-home')"
+          >
+            ✕
           </button>
-</div>
-</div>
-</div>
-<!-- QR Code Redemption Modal -->
-<div class="absolute inset-0 bg-black/60 backdrop-blur-xs z-40 hidden flex justify-center items-center p-4" id="modal-qr">
-<div class="bg-white rounded-3xl p-5 text-center max-w-[280px] w-full shadow-2xl relative border-2 border-softGreen">
-<h3 class="text-sm font-bold text-stone-800 mb-1" id="qr-title">兌換券核銷碼</h3>
-<p class="text-[10px] text-stone-500 mb-3">請向西環合作店家出示此二維碼</p>
-<div class="w-36 h-36 mx-auto bg-stone-100 p-2 rounded-xl flex items-center justify-center border border-stone-200">
-<svg class="w-full h-full" fill="#2C1D11" viewbox="0 0 100 100">
-<rect fill="#FFFFFF" height="100" width="100"></rect>
-<rect fill="#2C1D11" height="25" width="25" x="10" y="10"></rect>
-<rect fill="#FFFFFF" height="15" width="15" x="15" y="15"></rect>
-<rect fill="#2C1D11" height="9" width="9" x="18" y="18"></rect>
-<rect fill="#2C1D11" height="25" width="25" x="65" y="10"></rect>
-<rect fill="#FFFFFF" height="15" width="15" x="70" y="15"></rect>
-<rect fill="#2C1D11" height="9" width="9" x="73" y="18"></rect>
-<rect fill="#2C1D11" height="25" width="25" x="10" y="65"></rect>
-<rect fill="#FFFFFF" height="15" width="15" x="15" y="70"></rect>
-<rect fill="#2C1D11" height="9" width="9" x="18" y="73"></rect>
-<rect fill="#E98A3D" height="12" width="12" x="45" y="45"></rect>
-</svg>
-</div>
-<button class="w-full py-2.5 mt-4 bg-softGreen text-white text-xs font-bold rounded-xl shadow" onclick="closeModal('modal-qr')">
+
+          <div class="text-center">
+            <h3
+              id="gps-target-name"
+              class="font-extrabold text-sm text-white flex items-center gap-1"
+            >
+              📍 堅尼地城海旁日落角
+            </h3>
+            <p
+              id="gps-target-step"
+              class="text-[11px] text-amber-400 font-bold"
+            >
+              沿吉席街步行 300 米 ➔ 目的地
+            </p>
+          </div>
+
+          <div class="text-right text-xs">
+            <div class="font-black text-emerald-400">300m</div>
+            <div class="text-[10px] text-stone-400">步行 4 分</div>
+          </div>
+        </div>
+
+        <div class="relative flex-1 min-h-[460px] rounded-3xl overflow-hidden border-2 border-stone-700 shadow-2xl bg-stone-800 flex items-center justify-center">
+          <img
+            id="gps-map-image"
+            alt="Map Route View"
+            class="absolute inset-0 w-full h-full object-cover"
+            src="E49BFC4B-E6A5-4AC0-825E-41FDD7A6DADD.jpeg"
+            onerror="this.style.display='none'"
+          >
+
+          <div class="absolute inset-0 bg-gradient-to-b from-black/10 to-black/35"></div>
+
+          <div class="absolute top-4 right-4 bg-stone-900/80 backdrop-blur-md text-amber-400 p-2 rounded-full border border-stone-700 shadow-md">
+            🧭
+          </div>
+
+          <div class="absolute bottom-4 inset-x-4">
+            <button
+              class="w-full py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black text-sm rounded-2xl shadow-2xl transition-all border-2 border-emerald-300 flex justify-center items-center gap-2 pulse-glow active:scale-95"
+              onclick="triggerGpsArrivalCheckin()"
+            >
+              <span>📍</span>
+              GPS 偵測已抵達附近
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAP PAGE -->
+    <div class="page" id="page-fog-unlock">
+      <div class="p-4 flex flex-col gap-3 flex-1 overflow-y-auto no-scrollbar relative">
+        <header class="text-center my-1">
+          <h2 class="font-extrabold text-lg text-stone-800 flex items-center justify-center gap-1.5">
+            🗺️ 社區地圖與 VR 探索
+          </h2>
+          <p class="text-xs text-stone-500 font-medium">
+            預覽西區地圖與 1970 復古街景
+          </p>
+        </header>
+
+        <div class="bg-white p-1 rounded-xl border border-stone-200 flex text-xs font-bold shadow-sm">
+          <button
+            id="map-mode-btn-standard"
+            class="flex-1 py-1.5 rounded-lg bg-softGreen text-white transition-all text-center"
+            onclick="switchMapMode('standard')"
+          >
+            🗺️ 社區地圖
+          </button>
+
+          <button
+            id="map-mode-btn-vr"
+            class="flex-1 py-1.5 rounded-lg text-stone-600 hover:text-darkGreen transition-all text-center"
+            onclick="switchMapMode('vr')"
+          >
+            👓 1970 舊香港 VR
+          </button>
+        </div>
+
+        <div class="bg-cardBg p-3 rounded-2xl border border-lightGreen shadow-sm">
+          <div class="flex justify-between items-center text-xs font-bold mb-1">
+            <span class="text-darkGreen">西區社區探索度</span>
+            <span class="text-accentOrange text-sm font-black" id="progress-text">42%</span>
+          </div>
+
+          <div class="w-full h-3 bg-stone-200 rounded-full overflow-hidden">
+            <div
+              id="progress-bar"
+              class="h-full bg-accentOrange transition-all duration-1000"
+              style="width: 42%;"
+            ></div>
+          </div>
+        </div>
+
+        <div
+          id="map-view-standard"
+          class="relative h-80 rounded-2xl overflow-hidden border-2 border-darkGreen shadow-md bg-[#1d3d4b]"
+        >
+          <img
+            id="community-map-photo"
+            alt="社區地圖相片"
+            class="absolute inset-0 w-full h-full object-cover"
+            src="IMG_3576.jpeg"
+            onerror="this.style.display='none'"
+          >
+
+          <div class="absolute inset-0 bg-black/10"></div>
+
+          <div class="absolute top-4 left-4 bg-white/90 text-darkGreen px-3 py-1 rounded-xl text-xs font-bold shadow">
+            📍 堅尼地城
+          </div>
+        </div>
+
+        <div
+          id="map-view-vr"
+          class="relative h-80 rounded-2xl overflow-hidden border-2 border-amber-600 shadow-md hidden bg-amber-950"
+        >
+          <img
+            alt="1970s VR Street"
+            class="w-full h-full object-cover filter sepia contrast-125 brightness-90"
+            src="images.jpeg"
+            onerror="this.style.display='none'"
+          >
+
+          <div class="absolute inset-0 bg-amber-900/30 pointer-events-none"></div>
+
+          <div class="absolute top-2 left-2 bg-amber-900/80 text-amber-200 border border-amber-500/50 text-[10px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+            👓 360° 1970s Old Hong Kong VR
+          </div>
+
+          <div class="absolute bottom-4 left-6 bg-amber-100 text-amber-900 px-3 py-1.5 rounded-xl border border-amber-400 text-xs font-bold shadow-lg">
+            🚃 叮叮車復古老街景
+          </div>
+        </div>
+
+        <button
+          class="w-full py-3 bg-softGreen hover:bg-darkGreen text-white font-bold text-xs rounded-xl shadow-md transition-all mt-1"
+          onclick="switchPage('page-memories')"
+        >
+          查看社區記憶與寫下感想 →
+        </button>
+      </div>
+    </div>
+
+    <!-- REWARDS PAGE -->
+    <div class="page" id="page-rewards">
+      <div class="p-4 flex flex-col gap-3 flex-1 overflow-y-auto no-scrollbar">
+        <header class="flex justify-between items-center bg-cardBg p-3 rounded-2xl border border-lightGreen shadow-sm">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">🎁</span>
+            <div>
+              <h2 class="font-extrabold text-sm text-stone-800">
+                鄰里優惠與獎勵商店
+              </h2>
+              <p class="text-[10px] text-stone-500">
+                西環合作店家特約折扣與夥伴解鎖
+              </p>
+            </div>
+          </div>
+
+          <div class="bg-lightGreen/80 px-2.5 py-1 rounded-xl text-xs font-bold text-darkGreen">
+            🪙 <span class="global-tokens-display">260</span> Token
+          </div>
+        </header>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div class="bg-cardBg p-3 rounded-2xl border border-lightGreen text-center flex flex-col justify-between shadow-sm">
+            <div>
+              <div class="w-12 h-12 mx-auto bg-amber-100 rounded-2xl flex items-center justify-center text-2xl mb-1.5 border border-amber-200">
+                ☕
+              </div>
+              <h4 class="font-bold text-xs text-stone-800">西環小店咖啡優惠券</h4>
+              <p class="text-[10px] text-stone-500 mt-0.5 font-medium">
+                憑券折抵 HK$15
+              </p>
+            </div>
+
+            <div class="mt-2.5 pt-2 border-t border-stone-100">
+              <span class="text-xs font-extrabold text-amber-600 block mb-1">
+                80 Token
+              </span>
+
+              <button
+                class="w-full py-1.5 bg-softGreen hover:bg-darkGreen text-white text-xs font-bold rounded-xl transition shadow-sm"
+                onclick="redeemReward('西環咖啡折價券', 80)"
+              >
+                兌換
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-cardBg p-3 rounded-2xl border border-lightGreen text-center flex flex-col justify-between shadow-sm">
+            <div>
+              <div class="w-12 h-12 mx-auto bg-emerald-100 rounded-2xl flex items-center justify-center text-2xl mb-1.5 border border-emerald-200">
+                🚃
+              </div>
+              <h4 class="font-bold text-xs text-stone-800">丁丁電車精靈</h4>
+              <p class="text-[10px] text-emerald-700 mt-0.5 font-bold">
+                古蹟任務 Token +10%
+              </p>
+            </div>
+
+            <div class="mt-2.5 pt-2 border-t border-stone-100">
+              <span class="text-xs font-extrabold text-amber-600 block mb-1">
+                100 Token
+              </span>
+
+              <button
+                id="unlock-btn-tram"
+                class="w-full py-1.5 bg-darkGreen hover:bg-softGreen text-white text-xs font-bold rounded-xl transition shadow-sm"
+                onclick="unlockBuddy('丁丁電車精靈 🚃', '🚃', '+10% 復古景點 Token', 100, 'unlock-btn-tram')"
+              >
+                解鎖夥伴
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-cardBg p-3 rounded-2xl border border-lightGreen text-center flex flex-col justify-between shadow-sm">
+            <div>
+              <div class="w-12 h-12 mx-auto bg-sky-100 rounded-2xl flex items-center justify-center text-2xl mb-1.5 border border-sky-200">
+                🕊️
+              </div>
+              <h4 class="font-bold text-xs text-stone-800">海旁海鷗</h4>
+              <p class="text-[10px] text-sky-700 mt-0.5 font-bold">
+                海邊打卡額外 +10 Token
+              </p>
+            </div>
+
+            <div class="mt-2.5 pt-2 border-t border-stone-100">
+              <span class="text-xs font-extrabold text-amber-600 block mb-1">
+                120 Token
+              </span>
+
+              <button
+                id="unlock-btn-gull"
+                class="w-full py-1.5 bg-darkGreen hover:bg-softGreen text-white text-xs font-bold rounded-xl transition shadow-sm"
+                onclick="unlockBuddy('海旁海鷗 🕊️', '🕊️', '海邊打卡額外 +10 Token', 120, 'unlock-btn-gull')"
+              >
+                解鎖夥伴
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-cardBg p-3 rounded-2xl border border-lightGreen text-center flex flex-col justify-between shadow-sm">
+            <div>
+              <div class="w-12 h-12 mx-auto bg-rose-100 rounded-2xl flex items-center justify-center text-2xl mb-1.5 border border-rose-200">
+                ⛑️
+              </div>
+              <h4 class="font-bold text-xs text-stone-800">可愛冒險安全帽</h4>
+              <p class="text-[10px] text-stone-500 mt-0.5 font-medium">
+                個人造型頭飾
+              </p>
+            </div>
+
+            <div class="mt-2.5 pt-2 border-t border-stone-100">
+              <span class="text-xs font-extrabold text-amber-600 block mb-1">
+                30 Token
+              </span>
+
+              <button
+                class="w-full py-1.5 bg-softGreen hover:bg-darkGreen text-white text-xs font-bold rounded-xl transition shadow-sm"
+                onclick="redeemReward('可愛冒險安全帽', 30)"
+              >
+                兌換
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEMORIES PAGE -->
+    <div class="page" id="page-memories">
+      <div class="p-4 flex flex-col gap-3 flex-1 overflow-y-auto no-scrollbar">
+        <div class="flex items-center justify-between">
+          <button
+            class="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-700 shadow-sm"
+            onclick="switchPage('page-home')"
+          >
+            <i class="fa fa-arrow-left"></i>
+          </button>
+
+          <h2 class="font-bold text-stone-800 text-sm">
+            社區記憶與舊街故事
+          </h2>
+
+          <div class="w-8"></div>
+        </div>
+
+        <div class="bg-cardBg p-3.5 rounded-2xl border border-lightGreen shadow-sm space-y-2.5">
+          <h3 class="font-bold text-xs text-darkGreen flex items-center gap-1.5">
+            ✏️ 留下你對這個地方的感想
+          </h3>
+
+          <textarea
+            id="memory-input"
+            class="w-full p-2.5 text-xs bg-white border border-stone-200 rounded-xl focus:outline-none focus:border-softGreen text-stone-700 resize-none"
+            placeholder="寫下對這裡的感想或童年懷舊回憶..."
+            rows="3"
+          ></textarea>
+
+          <div class="flex justify-end items-center pt-1 border-t border-stone-100">
+            <button
+              class="px-4 py-1.5 bg-darkGreen text-white text-xs font-bold rounded-lg hover:bg-softGreen transition-all shadow-sm"
+              onclick="submitMemory()"
+            >
+              發佈感想
+            </button>
+          </div>
+        </div>
+
+        <div id="memories-list" class="flex flex-col gap-2.5">
+          <div class="bg-cardBg p-3 rounded-2xl border border-stone-100 shadow-sm">
+            <div class="flex justify-between items-center mb-1.5">
+              <div class="flex items-center gap-2">
+                <span class="text-base">👵</span>
+                <div>
+                  <p class="text-xs font-bold text-stone-800">陳奶奶</p>
+                  <p class="text-[10px] text-stone-400">1970年代口述 · 2小時前</p>
+                </div>
+              </div>
+
+              <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md font-bold">
+                📖 懷舊回憶
+              </span>
+            </div>
+
+            <p class="text-xs text-stone-700 leading-relaxed mb-2">
+              以前這裏還沒改建的時候，小時候下課總會跟同學在海邊看船隻駛過，日落的景致依然非常有溫度。
+            </p>
+
+            <div class="flex justify-between items-center text-[11px] text-stone-400 border-t border-stone-100 pt-1">
+              <span>❤️ 24 人覺得暖心</span>
+              <span>📍 堅尼地城海旁</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE PAGE -->
+    <div class="page" id="page-profile">
+      <div class="bg-[#BED39A] pt-3 pb-2 px-4 flex justify-between items-center text-stone-800 border-b border-[#B1C88B] shrink-0">
+        <button
+          class="hover:text-darkGreen transition text-stone-700 font-bold text-base"
+          onclick="switchPage('page-home')"
+        >
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <span class="font-extrabold text-base tracking-wide text-stone-800">
+          Neighbourhood Go!
+        </span>
+
+        <button
+          class="text-stone-700 font-bold hover:opacity-80 text-base"
+          onclick="openModal('modal-title')"
+        >
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+
+      <div class="relative bg-gradient-to-b from-[#BED39A] via-[#CDDCAB] to-[#FDFBF4] pt-4 pb-6 px-4 text-center overflow-hidden border-b border-[#C5DCAB] shrink-0">
+        <div class="relative w-24 h-24 mx-auto mb-2 z-10">
+          <div class="w-full h-full rounded-full bg-[#FFFDF5] border-4 border-[#8FA963] p-1 shadow-md overflow-hidden flex items-center justify-center">
+            <img
+              src="IMG_3512.jpeg"
+              alt="Profile Avatar"
+              class="w-full h-full object-cover rounded-full"
+              onerror="this.style.display='none'"
+            >
+          </div>
+
+          <div
+            id="profile-buddy-badge"
+            class="absolute -bottom-1 -right-1 bg-white border-2 border-amber-400 w-8 h-8 rounded-full flex items-center justify-center text-base shadow-sm"
+          >
+            🐈
+          </div>
+        </div>
+
+        <div class="flex flex-col items-center justify-center gap-1 mb-3 relative z-10">
+          <div class="flex items-center gap-2">
+            <h3 class="font-extrabold text-xl text-stone-900 tracking-tight leading-none">
+              小林
+            </h3>
+            <span class="bg-amber-300 border border-amber-400 text-amber-950 text-xs font-black px-2 py-0.5 rounded-full shadow-sm">
+              Lv.6
+            </span>
+          </div>
+
+          <p
+            id="profile-equipped-title"
+            class="text-xs text-stone-600 font-bold cursor-pointer hover:underline"
+            onclick="openModal('modal-title')"
+          >
+            社區新手
+          </p>
+        </div>
+
+        <div class="bg-white rounded-3xl p-3.5 border-2 border-[#EBE3CE] shadow-md grid grid-cols-3 divide-x divide-stone-200 relative z-10 mx-1 mt-1">
+          <div class="text-center px-1">
+            <p class="text-xs text-stone-600 font-bold mb-1">外出</p>
+            <p class="font-black text-lg text-amber-800 leading-none">12</p>
+            <p class="text-[10px] text-stone-500 font-bold mt-0.5">12 次</p>
+          </div>
+
+          <div class="text-center px-1">
+            <p class="text-xs text-stone-600 font-bold mb-1">造訪</p>
+            <p class="font-black text-lg text-amber-800 leading-none">8</p>
+            <p class="text-[10px] text-stone-500 font-bold mt-0.5">8 個地點</p>
+          </div>
+
+          <div class="text-center px-1">
+            <p class="text-xs text-stone-600 font-bold mb-1">行走</p>
+            <p class="font-black text-lg text-amber-800 leading-none">46</p>
+            <p class="text-[10px] text-stone-500 font-bold mt-0.5">46 km</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 space-y-4">
+        <div class="bg-[#FFFDF5] p-3.5 rounded-3xl border-2 border-[#EBE3CE] shadow-sm space-y-2.5">
+          <div class="flex justify-between items-center">
+            <h4 class="font-extrabold text-xs text-stone-800 flex items-center gap-1.5">
+              🌎 社區探索進度度量牆
+            </h4>
+
+            <span class="text-xs font-black text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-300">
+              總解鎖 58%
+            </span>
+          </div>
+
+          <div class="space-y-2 text-xs">
+            <div>
+              <div class="flex justify-between text-[11px] font-bold mb-1">
+                <span class="text-stone-700">🌊 堅尼地城</span>
+                <span class="text-darkGreen font-extrabold">72%</span>
+              </div>
+
+              <div class="w-full h-2.5 bg-stone-200 rounded-full overflow-hidden">
+                <div class="h-full bg-softGreen rounded-full" style="width:72%;"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-[11px] font-bold mb-1">
+                <span class="text-stone-700">🏛️ 西營盤</span>
+                <span class="text-amber-600 font-extrabold">45%</span>
+              </div>
+
+              <div class="w-full h-2.5 bg-stone-200 rounded-full overflow-hidden">
+                <div class="h-full bg-amber-500 rounded-full" style="width:45%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-cardBg p-3.5 rounded-2xl border border-lightGreen shadow-sm space-y-2">
+          <div class="flex justify-between items-center">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">🐾</span>
+              <div>
+                <h4 class="font-extrabold text-xs text-stone-800">
+                  社區散步夥伴
+                </h4>
+                <p class="text-[10px] text-stone-500 font-medium">
+                  同行散步可獲得額外 Token 加成
+                </p>
+              </div>
+            </div>
+
+            <button
+              class="text-[11px] bg-lightGreen text-darkGreen font-bold px-2.5 py-1 rounded-xl hover:bg-softGreen hover:text-white transition shadow-sm"
+              onclick="openModal('modal-buddy')"
+            >
+              更換夥伴
+            </button>
+          </div>
+
+          <div class="bg-white p-2.5 rounded-xl border border-stone-100 flex items-center gap-3">
+            <div
+              id="buddy-icon-display"
+              class="w-12 h-12 bg-amber-50 rounded-2xl border border-amber-200 flex items-center justify-center text-2xl shadow-sm"
+            >
+              🐈
+            </div>
+
+            <div class="flex-1">
+              <div class="flex justify-between items-center mb-0.5">
+                <h5 id="buddy-name-display" class="font-bold text-xs text-stone-800">
+                  西環巷仔貓 🐈
+                </h5>
+
+                <span class="text-[10px] text-rose-500 font-extrabold">
+                  親密度 Lv.3
+                </span>
+              </div>
+
+              <p
+                id="buddy-perk-display"
+                class="text-[10px] text-amber-700 font-semibold mb-1"
+              >
+                ❤️❤️❤️🤍🤍 (散步額外 +5% Token)
+              </p>
+
+              <div class="w-full h-1.5 bg-stone-100 rounded-full overflow-hidden">
+                <div class="h-full bg-rose-400 w-3/5 rounded-full"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-stone-200/80">
+          <h5 class="text-xs font-extrabold text-stone-700 mb-2 flex items-center gap-1.5">
+            🐾 近期探索足跡
+          </h5>
+
+          <div class="space-y-1.5 text-[11px] text-stone-600">
+            <div class="bg-cardBg p-2.5 rounded-xl border border-lightGreen flex justify-between items-center shadow-sm">
+              <span>📍 堅尼地城海旁日落角</span>
+              <span class="text-darkGreen font-extrabold">+30 Token</span>
+            </div>
+
+            <div class="bg-cardBg p-2.5 rounded-xl border border-lightGreen flex justify-between items-center shadow-sm">
+              <span>📍 西區社區中心</span>
+              <span class="text-darkGreen font-extrabold">+45 Token</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: START EXPLORATION -->
+    <div
+      id="modal-exploration-start"
+      class="absolute inset-0 bg-black/70 backdrop-blur-xs z-40 hidden flex justify-center items-center p-4"
+    >
+      <div class="bg-cardBg border-2 border-softGreen rounded-3xl p-4 w-full max-w-xs shadow-2xl space-y-3 badge-pop">
+        <div class="flex justify-between items-start border-b border-stone-200 pb-2">
+          <div>
+            <span class="text-[10px] bg-amber-100 text-amber-900 border border-amber-300 font-bold px-2 py-0.5 rounded-md">
+              📍 地點探索
+            </span>
+
+            <h3
+              id="modal-start-title"
+              class="font-extrabold text-base text-stone-900 mt-1"
+            >
+              堅尼地城海旁日落角
+            </h3>
+          </div>
+
+          <button
+            class="w-6 h-6 rounded-full bg-stone-200 text-stone-600 font-bold text-xs"
+            onclick="closeModal('modal-exploration-start')"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="h-32 rounded-xl overflow-hidden border border-stone-200">
+          <img
+            id="modal-start-img"
+            alt="Exploration Target"
+            class="w-full h-full object-cover"
+            src="IMG_3512.jpeg"
+            onerror="this.style.display='none'"
+          >
+        </div>
+
+        <p
+          id="modal-start-desc"
+          class="text-xs text-stone-600 font-medium leading-relaxed max-h-24 overflow-y-auto no-scrollbar"
+        >
+          位於港島西端海濱，是香港著名的日落海景勝地之一。
+        </p>
+
+        <div class="bg-stone-50 p-2.5 rounded-xl border border-stone-200 space-y-1.5">
+          <p class="text-[11px] font-bold text-stone-700">
+            選擇同行模式:
+          </p>
+
+          <div class="grid grid-cols-2 gap-2">
+            <button
+              id="modal-mode-solo"
+              class="py-2 px-2 rounded-lg border-2 border-softGreen bg-lightGreen text-darkGreen text-[11px] font-bold flex items-center justify-center gap-1 transition-all"
+              onclick="selectMode('solo')"
+            >
+              👤 獨自前往
+            </button>
+
+            <button
+              id="modal-mode-duo"
+              class="py-2 px-2 rounded-lg border border-stone-200 bg-white text-stone-600 text-[11px] font-bold flex items-center justify-center gap-1 transition-all"
+              onclick="selectMode('duo')"
+            >
+              👥 結伴同行
+            </button>
+          </div>
+        </div>
+
+        <button
+          class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-extrabold text-sm rounded-xl shadow-md transition-all flex justify-center items-center gap-2"
+          onclick="startGpsNavigation()"
+        >
+          🚀 開始導航前往
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL: CELEBRATION -->
+    <div
+      id="modal-celebration"
+      class="absolute inset-0 bg-black/70 backdrop-blur-xs z-40 hidden flex justify-center items-center p-4"
+    >
+      <div class="bg-cardBg border-4 border-amber-300 rounded-3xl p-5 text-center shadow-2xl w-full max-w-xs badge-pop relative overflow-hidden">
+        <div class="text-4xl mb-1">🎉</div>
+
+        <h3 class="font-black text-lg text-stone-800">
+          地標解鎖成功！
+        </h3>
+
+        <p
+          id="unlocked-landmark-name"
+          class="text-xs text-darkGreen font-bold mb-2"
+        >
+          堅尼地城海旁日落角
+        </p>
+
+        <div class="w-24 h-24 mx-auto my-1 relative flex items-center justify-center">
+          <svg viewBox="0 0 100 100" class="w-full h-full">
+            <circle cx="50" cy="50" r="44" fill="#FFEDD5" stroke="#F97316" stroke-width="4"/>
+            <circle cx="50" cy="42" r="18" fill="#F97316"/>
+            <path d="M15 68 Q50 55 85 68 Q50 80 15 68Z" fill="#0284C7"/>
+          </svg>
+        </div>
+
+        <div class="bg-amber-100/90 rounded-2xl p-2.5 my-2.5 border border-amber-200">
+          <p class="text-[11px] text-amber-900 font-bold">
+            獲得探索獎勵
+          </p>
+
+          <p
+            id="modal-token-amount"
+            class="text-xl font-black text-brandOrange"
+          >
+            +30 Token
+          </p>
+        </div>
+
+        <button
+          class="w-full py-3 bg-darkGreen hover:bg-softGreen text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-1"
+          onclick="goToMemoriesFromBadge()"
+        >
+          ✏️ 寫下感想與查看社區記憶 →
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL: AVATAR CLOTHING -->
+    <div
+      id="modal-avatar-dressup"
+      class="absolute inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex justify-center items-center p-4"
+    >
+      <div class="bg-cardBg rounded-3xl p-4 w-full max-w-xs border-2 border-softGreen shadow-2xl">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-black text-base text-stone-800">
+            👕 我的角色衣櫃
+          </h3>
+
+          <button
+            class="w-7 h-7 rounded-full bg-stone-200 font-bold"
+            onclick="closeModal('modal-avatar-dressup')"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <button
+            onclick="changeHomeAvatar('default')"
+            class="bg-white p-2 rounded-xl border-2 border-softGreen"
+          >
+            <div
+              id="avatar-preview-default"
+              class="h-28 w-full flex items-center justify-center"
+            ></div>
+
+            <p class="text-xs font-bold mt-2">
+              預設服裝
+            </p>
+          </button>
+
+          <button
+            onclick="changeHomeAvatar('winter')"
+            class="bg-white p-2 rounded-xl border border-stone-200"
+          >
+            <div
+              id="avatar-preview-winter"
+              class="h-28 w-full flex items-center justify-center"
+            ></div>
+
+            <p class="text-xs font-bold mt-2">
+              冬季服裝 ❄️
+            </p>
+          </button>
+        </div>
+
+        <button
+          onclick="showToast('✨ 更多服裝即將於商店推出！')"
+          class="w-full mt-3 p-3 rounded-xl border-2 border-dashed border-amber-400 bg-amber-50 text-amber-800 text-xs font-bold"
+        >
+          ＋ 更多服裝
+          <p class="text-[10px] mt-1">
+            更多服裝可於商店購買，敬請期待！
+          </p>
+        </button>
+
+        <p class="text-[10px] text-stone-500 leading-relaxed mt-3">
+          如要改用自己的角色圖片，請使用透明 PNG，例如：
+          <br>
+          avatar-default-transparent.png
+        </p>
+      </div>
+    </div>
+
+    <!-- MODAL: BACKGROUND -->
+    <div
+      id="modal-background"
+      class="absolute inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex justify-center items-center p-4"
+    >
+      <div class="bg-cardBg rounded-3xl p-4 w-full max-w-xs border-2 border-softGreen shadow-2xl">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-black text-base">
+            🏞️ 探索背景
+          </h3>
+
+          <button
+            class="w-7 h-7 rounded-full bg-stone-200 font-bold"
+            onclick="closeModal('modal-background')"
+          >
+            ✕
+          </button>
+        </div>
+
+        <button
+          onclick="changeHomeBackground('IMG_3512.jpeg')"
+          class="w-full bg-white border-2 border-softGreen rounded-xl p-2"
+        >
+          <img
+            src="IMG_3512.jpeg"
+            class="w-full h-28 object-cover rounded-lg"
+            alt="Kennedy Town Sunset"
+            onerror="this.style.display='none'"
+          >
+
+          <p class="text-xs font-bold mt-2">
+            🌅 堅尼地城海旁日落
+          </p>
+
+          <span class="text-[10px] text-emerald-700">
+            ✓ 可使用
+          </span>
+        </button>
+
+        <button
+          onclick="changeHomeBackground('IMG_3572.jpeg')"
+          class="w-full bg-white border border-stone-200 rounded-xl p-2 mt-3"
+        >
+          <img
+            src="IMG_3572.jpeg"
+            class="w-full h-28 object-cover rounded-lg"
+            alt="Another Background"
+            onerror="this.style.display='none'"
+          >
+
+          <p class="text-xs font-bold mt-2">
+            🌇 海邊散步背景
+          </p>
+        </button>
+
+        <button
+          onclick="showToast('✨ 更多背景即將推出！')"
+          class="w-full mt-3 p-3 rounded-xl border-2 border-dashed border-amber-400 bg-amber-50 text-amber-800 text-xs font-bold"
+        >
+          ＋ 更多背景即將推出
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL: BUDDY -->
+    <div
+      id="modal-buddy"
+      class="absolute inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex justify-center items-center p-4"
+    >
+      <div class="bg-cardBg rounded-3xl p-4 w-full max-w-xs shadow-2xl border-2 border-softGreen space-y-3">
+        <div class="flex justify-between items-center border-b border-stone-200 pb-2">
+          <h3 class="font-black text-sm text-stone-800">
+            🐾 選擇你的散步夥伴
+          </h3>
+
+          <button
+            class="w-6 h-6 rounded-full bg-stone-200 text-stone-600 font-bold text-xs"
+            onclick="closeModal('modal-buddy')"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div id="buddy-selection-list" class="space-y-2"></div>
+      </div>
+    </div>
+
+    <!-- MODAL: TITLE -->
+    <div
+      id="modal-title"
+      class="absolute inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex justify-center items-center p-4"
+    >
+      <div class="bg-cardBg rounded-3xl p-4 w-full max-w-xs shadow-2xl border-2 border-softGreen space-y-3">
+        <div class="flex justify-between items-center border-b border-stone-200 pb-2">
+          <h3 class="font-black text-sm text-stone-800">
+            🏷️ 佩戴你的社區稱號
+          </h3>
+
+          <button
+            class="w-6 h-6 rounded-full bg-stone-200 text-stone-600 font-bold text-xs"
+            onclick="closeModal('modal-title')"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="space-y-2">
+          <button
+            class="w-full p-2.5 bg-amber-50 rounded-xl border border-amber-300 text-left font-bold text-xs text-amber-900"
+            onclick="equipTitle('社區新手')"
+          >
+            🏷️ 【社區新手】
+          </button>
+
+          <button
+            class="w-full p-2.5 bg-emerald-50 rounded-xl border border-emerald-300 text-left font-bold text-xs text-emerald-900"
+            onclick="equipTitle('堅尼地城日落大使')"
+          >
+            🏷️ 【堅尼地城日落大使】
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: QR -->
+    <div
+      id="modal-qr"
+      class="absolute inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex justify-center items-center p-4"
+    >
+      <div class="bg-white rounded-3xl p-5 text-center max-w-[280px] w-full shadow-2xl relative border-2 border-softGreen">
+        <h3
+          id="qr-title"
+          class="text-sm font-bold text-stone-800 mb-1"
+        >
+          兌換券核銷碼
+        </h3>
+
+        <p class="text-[10px] text-stone-500 mb-3">
+          請向西環合作店家出示此二維碼
+        </p>
+
+        <div class="w-36 h-36 mx-auto bg-stone-100 p-2 rounded-xl flex items-center justify-center border border-stone-200">
+          <svg class="w-full h-full" fill="#2C1D11" viewBox="0 0 100 100">
+            <rect fill="#FFFFFF" height="100" width="100"></rect>
+            <rect fill="#2C1D11" height="25" width="25" x="10" y="10"></rect>
+            <rect fill="#FFFFFF" height="15" width="15" x="15" y="15"></rect>
+            <rect fill="#2C1D11" height="9" width="9" x="18" y="18"></rect>
+            <rect fill="#2C1D11" height="25" width="25" x="65" y="10"></rect>
+            <rect fill="#FFFFFF" height="15" width="15" x="70" y="15"></rect>
+            <rect fill="#2C1D11" height="9" width="9" x="73" y="18"></rect>
+            <rect fill="#2C1D11" height="25" width="25" x="10" y="65"></rect>
+            <rect fill="#FFFFFF" height="15" width="15" x="15" y="70"></rect>
+            <rect fill="#2C1D11" height="9" width="9" x="18" y="73"></rect>
+            <rect fill="#E98A3D" height="12" width="12" x="45" y="45"></rect>
+          </svg>
+        </div>
+
+        <button
+          class="w-full py-2.5 mt-4 bg-softGreen text-white text-xs font-bold rounded-xl shadow"
+          onclick="closeModal('modal-qr')"
+        >
           完成核銷
         </button>
-</div>
-</div>
-<!-- AVATAR CLOTHING SELECTOR -->
-<div
-  id="modal-avatar-dressup"
-  class="absolute inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex justify-center items-center p-4"
->
-  <div class="bg-cardBg rounded-3xl p-4 w-full max-w-xs border-2 border-softGreen shadow-2xl">
-
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="font-black text-base text-stone-800">
-        👕 我的角色衣櫃
-      </h3>
-
-      <button onclick="closeModal('modal-avatar-dressup')">
-        ✕
-      </button>
+      </div>
     </div>
 
-    <div class="grid grid-cols-2 gap-3">
-
-      <!-- DEFAULT CLOTHING -->
+    <!-- Bottom Navigation -->
+    <nav class="absolute bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-stone-200 grid grid-cols-4 py-2 text-center z-20">
       <button
-        onclick="changeHomeAvatar('C05EBBD8-F70B-41EE-A1EB-518C922E41C5.png')"
-        class="bg-white p-2 rounded-xl border-2 border-softGreen"
+        id="nav-home"
+        class="flex flex-col items-center text-darkGreen font-bold"
+        onclick="switchPage('page-home')"
       >
-        <img
-          src="C05EBBD8-F70B-41EE-A1EB-518C922E41C5.png"
-          class="h-28 w-full object-contain"
-          alt="Default Clothing"
-        >
-        <p class="text-xs font-bold mt-2">
-          預設服裝
-        </p>
+        <i class="fa-solid fa-house text-base"></i>
+        <span class="text-[10px] font-bold mt-0.5">首頁</span>
       </button>
 
-      <!-- WINTER CLOTHING -->
       <button
-        onclick="changeHomeAvatar('9A6E30B4-9BEA-4DD6-A1C7-F75E4F6B0A6F.png')"
-        class="bg-white p-2 rounded-xl border border-stone-200"
+        id="nav-fog"
+        class="flex flex-col items-center text-stone-400 hover:text-darkGreen"
+        onclick="switchPage('page-fog-unlock')"
       >
-        <img
-          src="9A6E30B4-9BEA-4DD6-A1C7-F75E4F6B0A6F.png"
-          class="h-28 w-full object-contain"
-          alt="Winter Clothing"
-        >
-        <p class="text-xs font-bold mt-2">
-          冬季服裝 ❄️
-        </p>
+        <i class="fa-solid fa-map-location-dot text-base"></i>
+        <span class="text-[10px] font-bold mt-0.5">地圖</span>
       </button>
 
-    </div>
+      <button
+        id="nav-rewards"
+        class="flex flex-col items-center text-stone-400 hover:text-darkGreen"
+        onclick="switchPage('page-rewards')"
+      >
+        <i class="fa-solid fa-gift text-base"></i>
+        <span class="text-[10px] font-bold mt-0.5">獎勵</span>
+      </button>
 
-    <!-- ADD MORE CLOTHING -->
-    <button
-      onclick="showToast('✨ 更多服裝即將於商店推出！')"
-      class="w-full mt-3 p-3 rounded-xl border-2 border-dashed border-amber-400 bg-amber-50 text-amber-800 text-xs font-bold"
-    >
-      ＋ 更多服裝
-
-      <p class="text-[10px] mt-1">
-        更多服裝可於商店購買，敬請期待！
-      </p>
-    </button>
+      <button
+        id="nav-profile"
+        class="flex flex-col items-center text-stone-400 hover:text-darkGreen"
+        onclick="switchPage('page-profile')"
+      >
+        <i class="fa-solid fa-user text-base"></i>
+        <span class="text-[10px] font-bold mt-0.5">我的</span>
+      </button>
+    </nav>
 
   </div>
-</div>
-<!-- BACKGROUND SELECTOR -->
-<div
-  id="modal-background"
-  class="absolute inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex justify-center items-center p-4"
->
-  <div class="bg-cardBg rounded-3xl p-4 w-full max-w-xs border-2 border-softGreen shadow-2xl">
 
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="font-black text-base">
-        🏞️ 探索背景
-      </h3>
+  <script>
+    /*
+      IMPORTANT IMAGE RULE:
 
-      <button onclick="closeModal('modal-background')">
-        ✕
-      </button>
-    </div>
+      Background image = scenery only.
+      Avatar image = transparent PNG / transparent SVG only.
+      Buddy = emoji or transparent image.
 
-    <!-- Available Background -->
-    <button
-      onclick="changeHomeBackground('IMG_3512.jpeg')"
-      class="w-full bg-white border-2 border-softGreen rounded-xl p-2"
-    >
-      <img
-        src="IMG_3512.jpeg"
-        class="w-full h-28 object-cover rounded-lg"
-        alt="Kennedy Town Sunset"
-      >
+      If your avatar image has trees/road/sky inside it,
+      it will cover the background again.
+    */
 
-      <p class="text-xs font-bold mt-2">
-        🌅 堅尼地城海旁日落
-      </p>
+    const transparentAvatarDefaultSvg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="180" height="260" viewBox="0 0 180 260">
+        <g>
+          <ellipse cx="90" cy="242" rx="42" ry="10" fill="rgba(0,0,0,0.22)"/>
+          <circle cx="90" cy="55" r="34" fill="#FFD6A5" stroke="#5C3A1E" stroke-width="3"/>
+          <path d="M56 52 C58 20 122 18 124 54 C112 38 72 38 56 52Z" fill="#5A321A"/>
+          <circle cx="78" cy="58" r="3.5" fill="#2C1D11"/>
+          <circle cx="102" cy="58" r="3.5" fill="#2C1D11"/>
+          <path d="M78 76 Q90 86 103 76" fill="none" stroke="#9A3412" stroke-width="4" stroke-linecap="round"/>
+          <rect x="57" y="94" width="66" height="92" rx="24" fill="#F8FAFC" stroke="#D6D3D1" stroke-width="4"/>
+          <path d="M72 100 L90 130 L108 100" fill="none" stroke="#E5E7EB" stroke-width="5" stroke-linecap="round"/>
+          <rect x="49" y="104" width="22" height="80" rx="11" fill="#F8FAFC" stroke="#D6D3D1" stroke-width="4"/>
+          <rect x="109" y="104" width="22" height="80" rx="11" fill="#F8FAFC" stroke="#D6D3D1" stroke-width="4"/>
+          <rect x="64" y="182" width="23" height="52" rx="9" fill="#3F3F46"/>
+          <rect x="94" y="182" width="23" height="52" rx="9" fill="#3F3F46"/>
+          <rect x="57" y="230" width="32" height="13" rx="6" fill="#92400E"/>
+          <rect x="91" y="230" width="32" height="13" rx="6" fill="#92400E"/>
+          <path d="M72 102 Q90 121 108 102" fill="none" stroke="#FBBF24" stroke-width="6" stroke-linecap="round"/>
+        </g>
+      </svg>
+    `;
 
-      <span class="text-[10px] text-emerald-700">
-        ✓ 可使用
-      </span>
-    </button>
+    const transparentAvatarWinterSvg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="180" height="260" viewBox="0 0 180 260">
+        <g>
+          <ellipse cx="90" cy="242" rx="42" ry="10" fill="rgba(0,0,0,0.22)"/>
+          <circle cx="90" cy="55" r="34" fill="#FFD6A5" stroke="#5C3A1E" stroke-width="3"/>
+          <path d="M56 52 C58 20 122 18 124 54 C112 38 72 38 56 52Z" fill="#5A321A"/>
+          <circle cx="78" cy="58" r="3.5" fill="#2C1D11"/>
+          <circle cx="102" cy="58" r="3.5" fill="#2C1D11"/>
+          <path d="M78 76 Q90 86 103 76" fill="none" stroke="#9A3412" stroke-width="4" stroke-linecap="round"/>
+          <rect x="54" y="92" width="72" height="94" rx="24" fill="#DDEAFE" stroke="#60A5FA" stroke-width="4"/>
+          <path d="M60 104 Q90 130 120 104" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round"/>
+          <rect x="45" y="103" width="25" height="83" rx="12" fill="#DDEAFE" stroke="#60A5FA" stroke-width="4"/>
+          <rect x="110" y="103" width="25" height="83" rx="12" fill="#DDEAFE" stroke="#60A5FA" stroke-width="4"/>
+          <path d="M65 124 L115 124" stroke="#2563EB" stroke-width="5" stroke-linecap="round"/>
+          <rect x="64" y="182" width="23" height="52" rx="9" fill="#1E293B"/>
+          <rect x="94" y="182" width="23" height="52" rx="9" fill="#1E293B"/>
+          <rect x="57" y="230" width="32" height="13" rx="6" fill="#0F172A"/>
+          <rect x="91" y="230" width="32" height="13" rx="6" fill="#0F172A"/>
+          <circle cx="64" cy="28" r="10" fill="#FFFFFF"/>
+          <path d="M56 38 C62 10 118 10 124 38" fill="#60A5FA" stroke="#2563EB" stroke-width="4"/>
+        </g>
+      </svg>
+    `;
 
-    <!-- More Backgrounds -->
-    <button
-      onclick="showToast('✨ 更多背景即將推出！')"
-      class="w-full mt-3 p-3 rounded-xl border-2 border-dashed border-amber-400 bg-amber-50 text-amber-800 text-xs font-bold"
-    >
-      ＋ 更多背景即將推出
-    </button>
+    const avatarImages = {
+      default: makeSvgDataUrl(transparentAvatarDefaultSvg),
+      winter: makeSvgDataUrl(transparentAvatarWinterSvg)
 
-  </div>
-</div>
-<!-- Fixed Bottom Navigation Bar (4 main tabs) -->
-<nav class="absolute bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-stone-200 grid grid-cols-4 py-2 text-center z-20">
-<button class="flex flex-col items-center text-darkGreen font-bold" id="nav-home" onclick="switchPage('page-home')">
-<i class="fa-solid fa-house text-base"></i>
-<span class="text-[10px] font-bold mt-0.5">首頁</span>
-</button>
-<button class="flex flex-col items-center text-stone-400 hover:text-darkGreen" id="nav-fog" onclick="switchPage('page-fog-unlock')">
-<i class="fa-solid fa-map-location-dot text-base"></i>
-<span class="text-[10px] font-bold mt-0.5">地圖</span>
-</button>
-<button class="flex flex-col items-center text-stone-400 hover:text-darkGreen" id="nav-rewards" onclick="switchPage('page-rewards')">
-<i class="fa-solid fa-gift text-base"></i>
-<span class="text-[10px] font-bold mt-0.5">獎勵</span>
-</button>
-<button class="flex flex-col items-center text-stone-400 hover:text-darkGreen" id="nav-profile" onclick="switchPage('page-profile')">
-<i class="fa-solid fa-user text-base"></i>
-<span class="text-[10px] font-bold mt-0.5">我的</span>
-</button>
-</nav>
-</div>
-<script>
-    // 圖片位置 5：地點推薦相片。修改每個地點資料內的 image: 圖片檔案名稱。
-      // 例如 image: "kennedy-town.jpg"，並把圖片放在 HTML 同一個資料夾。
-      const landmarkDatabase = [
+      /*
+        If you have transparent PNG files, you can use this instead:
+
+        default: 'avatar-default-transparent.png',
+        winter: 'avatar-winter-transparent.png'
+
+        Do not use an image with a full background here.
+      */
+    };
+
+    const landmarkDatabase = [
       {
-        name: "堅尼地城海旁日落角",
-        nameEn: "堅尼地城 Praya Sunset",
-        district: "堅尼地城",
-        districtEn: "堅尼地城",
-        tags: "海景、日落、攝影、質感Café",
-        tagsEn: "Sea view, Sunset, Photography",
-        desc: "【地點背景】位於港島西端海濱，是香港最著名的日落海景勝地之一。遠眺維港夕陽餘暉、青洲燈塔與海天一色勝景。\n【周邊特色地點】堅尼地城海濱長廊、卑路乍灣公園、堅尼地城籃球場、沿海質感 Café 與老字號茶餐廳。",
-        descEn: "位於堅尼地城海旁的著名日落景點，可欣賞海景及到訪特色咖啡店。",
+        name: '堅尼地城海旁日落角',
+        district: '堅尼地城',
+        tags: '海景、日落、質感Café',
+        desc: '位於港島西端海濱，是香港著名的日落海景勝地之一。遠眺維港夕陽餘暉與海天一色勝景。',
         tokens: 30,
-        routeZh: "沿吉席街步行 300 米 ➔ 堅尼地城海旁",
-        routeEn: "Walk 300m down Catchick St ➔ K-Town Praya",
-        checkins: 42,
-        image: "IMG_3572.jpeg",
-        gpsImage: "E49BFC4B-E6A5-4AC0-825E-41FDD7A6DADD.jpeg",
-        svgBadge: `<svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="44" fill="#FFEDD5" stroke="#F97316" stroke-width="4"/><circle cx="50" cy="42" r="18" fill="#F97316"/><path d="M15 68 Q 50 55, 85 68 Q 50 80, 15 68 Z" fill="#0284C7"/></svg>`
+        image: 'IMG_3512.jpeg',
+        gpsImage: 'E49BFC4B-E6A5-4AC0-825E-41FDD7A6DADD.jpeg',
+        route: '沿吉席街步行 300 米 ➔ 堅尼地城海旁'
       },
       {
-        name: "西區社區中心",
-        nameEn: "西區社區中心",
-        district: "西營盤",
-        districtEn: "西營盤",
-        tags: "古蹟、拱廊建築、歷史風格",
-        tagsEn: "Heritage, Architecture, History",
-        desc: "【地點背景】原為舊精神病院及舊西區社區中心，建於1892年，屬二級歷史建築，具備極為罕見的花崗石拱廊與維多利亞時代巴洛克式建築風格。",
-        descEn: "二級歷史建築，擁有罕見的維多利亞式花崗石拱廊及豐富歷史。",
+        name: '西區社區中心',
+        district: '西營盤',
+        tags: '古蹟、拱廊建築、歷史風格',
+        desc: '西區社區中心具備罕見花崗石拱廊與維多利亞時代建築特色，是西區重要歷史地標。',
         tokens: 45,
-        routeZh: "出西營盤站 B3 出口 ➔ 沿高街直行 150 米",
-        routeEn: "SYP Station Exit B3 ➔ Walk 150m down High Street",
-        checkins: 28,
-        image: "7808C041-7D70-4A44-928B-ACE1CF668A32.png",
-        gpsImage: "8D093417-AF46-41E6-B364-8458400B8622.jpeg",
-        svgBadge: `<svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="44" fill="#FFFDF5" stroke="#E98A3D" stroke-width="4"/><path d="M25 65 C 15 45, 25 25, 48 20" fill="none" stroke="#5C7A2D" stroke-width="4" stroke-linecap="round"/><path d="M75 65 C 85 45, 75 25, 52 20" fill="none" stroke="#5C7A2D" stroke-width="4" stroke-linecap="round"/><rect x="36" y="42" width="28" height="22" rx="2" fill="#8FA963" /><polygon points="34,42 50,30 66,42" fill="#E98A3D" /></svg>`
+        image: 'IMG_3572.jpeg',
+        gpsImage: '8D093417-AF46-41E6-B364-8458400B8622.jpeg',
+        route: '出西營盤站 B3 出口 ➔ 沿高街直行 150 米'
       }
     ];
 
     let currentTokens = 260;
-    let selectedModeMultiplier = 1.0;
     let currentLandmarkIdx = 0;
-    let selectedImageBase64 = null;
-    let hasCompletedMission = false;
+    let selectedModeMultiplier = 1.0;
+
+    const homeSceneState = {
+      background: 'IMG_3512.jpeg',
+      avatar: avatarImages.default,
+      buddyIcon: '🐈'
+    };
 
     const unlockedBuddies = [
-      { name: "西環巷仔貓 🐈", icon: "🐈", perk: "散步額外 +5% Token" }
+      {
+        name: '西環巷仔貓 🐈',
+        icon: '🐈',
+        perk: '散步額外 +5% Token'
+      }
     ];
+
+    function makeSvgDataUrl(svg) {
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    }
 
     function showToast(msg) {
       const toast = document.getElementById('toast-notification');
-      if (toast) {
-        document.getElementById('toast-message').innerText = msg;
-        toast.classList.remove('hidden');
-        setTimeout(() => { toast.classList.add('hidden'); }, 3000);
-      }
+      const message = document.getElementById('toast-message');
+
+      if (!toast || !message) return;
+
+      message.innerText = msg;
+      toast.classList.remove('hidden');
+
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 2600);
+    }
+
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.add('hidden');
     }
 
     function updateAllTokenDisplays() {
@@ -1188,65 +1438,190 @@ GPS 偵測已抵達附近 (點擊完成探索)
     }
 
     function switchPage(pageId) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      const targetPage = document.getElementById(pageId);
-      if (targetPage) {
-        targetPage.classList.add('active');
-        targetPage.scrollTop = 0;
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+      });
+
+      const target = document.getElementById(pageId);
+      if (target) {
+        target.classList.add('active');
+        target.scrollTop = 0;
       }
 
-      const navs = ['home', 'fog', 'rewards', 'profile'];
-      navs.forEach(n => {
-        const btn = document.getElementById('nav-' + n);
-        if (btn) {
-          if ((pageId === 'page-' + n) || (pageId === 'page-detail' && n === 'home') || (pageId === 'page-memories' && n === 'home') || (pageId === 'page-gps-sim' && n === 'home')) {
-            btn.className = "flex flex-col items-center text-darkGreen font-bold";
-          } else {
-            btn.className = "flex flex-col items-center text-stone-400 hover:text-darkGreen";
-          }
+      const map = {
+        'page-home': 'home',
+        'page-gps-sim': 'home',
+        'page-memories': 'home',
+        'page-fog-unlock': 'fog',
+        'page-rewards': 'rewards',
+        'page-profile': 'profile'
+      };
+
+      const activeNav = map[pageId];
+
+      ['home', 'fog', 'rewards', 'profile'].forEach(nav => {
+        const btn = document.getElementById('nav-' + nav);
+        if (!btn) return;
+
+        if (nav === activeNav) {
+          btn.className = 'flex flex-col items-center text-darkGreen font-bold';
+        } else {
+          btn.className = 'flex flex-col items-center text-stone-400 hover:text-darkGreen';
         }
       });
     }
 
-    function toggleLanguage() { /* 純繁體中文版 */ }
+    function renderHomeScene() {
+      const bg = document.getElementById('main-page-map-photo');
+      const avatar = document.getElementById('home-avatar');
+      const buddy = document.getElementById('home-walking-buddy');
 
-    function selectSpotFromMap(index) {
-      currentLandmarkIdx = index % landmarkDatabase.length;
-      updateLocationCardUI();
-      openExplorationStartModal();
+      if (bg) {
+        bg.style.display = '';
+        bg.src = homeSceneState.background;
+      }
+
+      if (avatar) {
+        avatar.src = homeSceneState.avatar;
+      }
+
+      if (buddy) {
+        buddy.innerText = homeSceneState.buddyIcon;
+      }
+    }
+
+    function renderAvatarPreviews() {
+      const defaultPreview = document.getElementById('avatar-preview-default');
+      const winterPreview = document.getElementById('avatar-preview-winter');
+
+      if (defaultPreview) {
+        defaultPreview.innerHTML = `
+          <img src="${avatarImages.default}" class="h-28 w-auto object-contain" alt="Default Avatar">
+        `;
+      }
+
+      if (winterPreview) {
+        winterPreview.innerHTML = `
+          <img src="${avatarImages.winter}" class="h-28 w-auto object-contain" alt="Winter Avatar">
+        `;
+      }
+    }
+
+    function changeHomeAvatar(keyOrFile) {
+      if (avatarImages[keyOrFile]) {
+        homeSceneState.avatar = avatarImages[keyOrFile];
+      } else {
+        homeSceneState.avatar = keyOrFile;
+      }
+
+      renderHomeScene();
+      closeModal('modal-avatar-dressup');
+      showToast('✨ 角色服裝更換成功！');
+    }
+
+    function changeHomeBackground(imageFile) {
+      homeSceneState.background = imageFile;
+      renderHomeScene();
+      closeModal('modal-background');
+      showToast('🌅 背景更換成功！');
+    }
+
+    function selectBuddy(fullName, icon, perk) {
+      homeSceneState.buddyIcon = icon;
+      renderHomeScene();
+
+      const homeBadge = document.getElementById('home-buddy-icon-badge');
+      if (homeBadge) homeBadge.innerText = icon;
+
+      const sceneBuddy = document.getElementById('home-walking-buddy');
+      if (sceneBuddy) sceneBuddy.innerText = icon;
+
+      const buddyName = document.getElementById('buddy-name-display');
+      if (buddyName) buddyName.innerText = fullName;
+
+      const buddyIcon = document.getElementById('buddy-icon-display');
+      if (buddyIcon) buddyIcon.innerText = icon;
+
+      const profileBadge = document.getElementById('profile-buddy-badge');
+      if (profileBadge) profileBadge.innerText = icon;
+
+      const buddyPerk = document.getElementById('buddy-perk-display');
+      if (buddyPerk) {
+        buddyPerk.innerText = `❤️❤️❤️🤍🤍 (${perk})`;
+      }
+
+      closeModal('modal-buddy');
+      showToast(`已切換夥伴為 ${fullName}`);
+    }
+
+    function renderBuddySelectionList() {
+      const container = document.getElementById('buddy-selection-list');
+      if (!container) return;
+
+      container.innerHTML = unlockedBuddies.map(buddy => {
+        return `
+          <button
+            onclick="selectBuddy('${buddy.name}', '${buddy.icon}', '${buddy.perk}')"
+            class="w-full p-2.5 bg-white hover:bg-amber-50 rounded-xl border border-stone-200 flex items-center gap-3 text-left transition shadow-sm"
+          >
+            <span class="text-3xl">${buddy.icon}</span>
+            <div>
+              <p class="font-extrabold text-xs text-stone-800">${buddy.name}</p>
+              <p class="text-[10px] text-amber-700 font-medium">特技: ${buddy.perk}</p>
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function unlockBuddy(name, icon, perk, cost, btnId) {
+      if (currentTokens < cost) {
+        showToast('⚠️ Token 餘額不足！請先完成任務。');
+        return;
+      }
+
+      currentTokens -= cost;
+      updateAllTokenDisplays();
+
+      unlockedBuddies.push({
+        name,
+        icon,
+        perk
+      });
+
+      renderBuddySelectionList();
+
+      const btn = document.getElementById(btnId);
+      if (btn) {
+        btn.innerText = '✓ 已解鎖';
+        btn.disabled = true;
+        btn.className = 'w-full py-1.5 bg-stone-300 text-stone-600 text-xs font-bold rounded-xl cursor-not-allowed';
+      }
+
+      showToast(`🎉 成功解鎖夥伴【${name}】！`);
+    }
+
+    function updateLocationCardUI() {
+      const data = landmarkDatabase[currentLandmarkIdx];
+
+      document.getElementById('target-title').innerText = data.name;
+      document.getElementById('target-district').innerText = data.district;
+      document.getElementById('target-tags').innerText = data.tags;
+      document.getElementById('target-desc').innerText = data.desc;
+
+      document.getElementById('modal-start-title').innerText = data.name;
+      document.getElementById('modal-start-desc').innerText = data.desc;
+      document.getElementById('modal-start-img').src = data.image;
+
+      document.getElementById('gps-target-name').innerText = '📍 ' + data.name;
+      document.getElementById('gps-target-step').innerText = data.route;
+      document.getElementById('gps-map-image').src = data.gpsImage;
     }
 
     function randomizeLocation() {
       currentLandmarkIdx = (currentLandmarkIdx + 1) % landmarkDatabase.length;
       updateLocationCardUI();
-    }
-
-    function updateLocationCardUI() {
-      const data = landmarkDatabase[currentLandmarkIdx];
-      const isZh = true;
-
-      document.getElementById('target-title').innerText = isZh ? data.name : data.nameEn;
-      document.getElementById('target-district').innerText = isZh ? data.district : data.districtEn;
-      document.getElementById('target-tags').innerText = isZh ? data.tags : data.tagsEn;
-      document.getElementById('target-desc').innerText = isZh ? data.desc : data.descEn;
-
-      document.getElementById('detail-header-title').innerText = isZh ? data.name : data.nameEn;
-      document.getElementById('detail-tags').innerText = isZh ? data.tags : data.tagsEn;
-      document.getElementById('detail-full-desc').innerText = isZh ? data.desc : data.descEn;
-      document.getElementById('detail-image').src = data.image;
-      document.getElementById('detail-checkin-count').innerText = data.checkins;
-
-      // Update Modal
-      document.getElementById('modal-start-title').innerText = isZh ? data.name : data.nameEn;
-      document.getElementById('modal-start-img').src = data.image;
-      document.getElementById('modal-start-desc').innerText = isZh ? data.desc : data.descEn;
-
-      // Update GPS view
-      document.getElementById('gps-target-name').innerText = "📍 " + (isZh ? data.name : data.nameEn);
-      document.getElementById('gps-target-step').innerText = isZh ? data.routeZh : data.routeEn;
-      document.getElementById('gps-map-image').src = data.gpsImage;
-
-      updateDetailRewardText();
+      showToast('🎲 已切換推薦地點');
     }
 
     function openExplorationStartModal() {
@@ -1255,32 +1630,20 @@ GPS 偵測已抵達附近 (點擊完成探索)
     }
 
     function selectMode(mode) {
-      const btnSolo = document.getElementById('mode-solo');
-      const btnDuo = document.getElementById('mode-duo');
-      const mBtnSolo = document.getElementById('modal-mode-solo');
-      const mBtnDuo = document.getElementById('modal-mode-duo');
+      const solo = document.getElementById('modal-mode-solo');
+      const duo = document.getElementById('modal-mode-duo');
 
       if (mode === 'solo') {
         selectedModeMultiplier = 1.0;
-        if (btnSolo) btnSolo.className = "py-2 px-3 rounded-xl border-2 border-softGreen bg-lightGreen text-darkGreen text-xs font-bold flex items-center justify-center gap-1 transition-all";
-        if (btnDuo) btnDuo.className = "py-2 px-3 rounded-xl border border-stone-200 bg-white text-stone-600 text-xs font-bold flex items-center justify-center gap-1 transition-all";
-        if (mBtnSolo) mBtnSolo.className = "py-2 px-2 rounded-lg border-2 border-softGreen bg-lightGreen text-darkGreen text-[11px] font-bold flex items-center justify-center gap-1 transition-all";
-        if (mBtnDuo) mBtnDuo.className = "py-2 px-2 rounded-lg border border-stone-200 bg-white text-stone-600 text-[11px] font-bold flex items-center justify-center gap-1 transition-all";
+
+        solo.className = 'py-2 px-2 rounded-lg border-2 border-softGreen bg-lightGreen text-darkGreen text-[11px] font-bold flex items-center justify-center gap-1 transition-all';
+        duo.className = 'py-2 px-2 rounded-lg border border-stone-200 bg-white text-stone-600 text-[11px] font-bold flex items-center justify-center gap-1 transition-all';
       } else {
         selectedModeMultiplier = 1.5;
-        if (btnDuo) btnDuo.className = "py-2 px-3 rounded-xl border-2 border-softGreen bg-lightGreen text-darkGreen text-xs font-bold flex items-center justify-center gap-1 transition-all";
-        if (btnSolo) btnSolo.className = "py-2 px-3 rounded-xl border border-stone-200 bg-white text-stone-600 text-xs font-bold flex items-center justify-center gap-1 transition-all";
-        if (mBtnDuo) mBtnDuo.className = "py-2 px-2 rounded-lg border-2 border-softGreen bg-lightGreen text-darkGreen text-[11px] font-bold flex items-center justify-center gap-1 transition-all";
-        if (mBtnSolo) mBtnSolo.className = "py-2 px-2 rounded-lg border border-stone-200 bg-white text-stone-600 text-[11px] font-bold flex items-center justify-center gap-1 transition-all";
-      }
-      updateDetailRewardText();
-    }
 
-    function updateDetailRewardText() {
-      const data = landmarkDatabase[currentLandmarkIdx];
-      const earned = Math.round(data.tokens * selectedModeMultiplier);
-      const textEl = document.getElementById('detail-reward-text');
-      if (textEl) textEl.innerText = `+${earned} Token`;
+        duo.className = 'py-2 px-2 rounded-lg border-2 border-softGreen bg-lightGreen text-darkGreen text-[11px] font-bold flex items-center justify-center gap-1 transition-all';
+        solo.className = 'py-2 px-2 rounded-lg border border-stone-200 bg-white text-stone-600 text-[11px] font-bold flex items-center justify-center gap-1 transition-all';
+      }
     }
 
     function startGpsNavigation() {
@@ -1291,35 +1654,28 @@ GPS 偵測已抵達附近 (點擊完成探索)
     function triggerGpsArrivalCheckin() {
       const data = landmarkDatabase[currentLandmarkIdx];
       const earned = Math.round(data.tokens * selectedModeMultiplier);
+
       currentTokens += earned;
-      hasCompletedMission = true;
-      
+
       updateAllTokenDisplays();
+
       document.getElementById('modal-token-amount').innerText = `+${earned} Token`;
-      
-      const isZh = true;
-      document.getElementById('unlocked-landmark-name').innerText = isZh ? data.name : data.nameEn;
-      document.getElementById('modal-badge-container').innerHTML = data.svgBadge;
+      document.getElementById('unlocked-landmark-name').innerText = data.name;
 
       if (typeof confetti === 'function') {
-        confetti({ particleCount: 85, spread: 70, origin: { y: 0.6 } });
+        confetti({
+          particleCount: 85,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
       }
 
-      document.getElementById('modal-celebration').classList.remove('hidden');
+      openModal('modal-celebration');
     }
 
     function goToMemoriesFromBadge() {
-      document.getElementById('modal-celebration').classList.add('hidden');
+      closeModal('modal-celebration');
       switchPage('page-memories');
-    }
-
-    function goToFogUnlockPage(fromMission = false) {
-      document.getElementById('modal-celebration').classList.add('hidden');
-      switchPage('page-fog-unlock');
-      
-      if (fromMission || hasCompletedMission) {
-        document.getElementById('fog-overlay').classList.remove('hidden');
-      }
     }
 
     function switchMapMode(mode) {
@@ -1329,87 +1685,37 @@ GPS 偵測已抵達附近 (點擊完成探索)
       const vrView = document.getElementById('map-view-vr');
 
       if (mode === 'standard') {
-        stdBtn.className = "flex-1 py-1.5 rounded-lg bg-softGreen text-white transition-all text-center";
-        vrBtn.className = "flex-1 py-1.5 rounded-lg text-stone-600 hover:text-darkGreen transition-all text-center";
+        stdBtn.className = 'flex-1 py-1.5 rounded-lg bg-softGreen text-white transition-all text-center';
+        vrBtn.className = 'flex-1 py-1.5 rounded-lg text-stone-600 hover:text-darkGreen transition-all text-center';
+
         stdView.classList.remove('hidden');
         vrView.classList.add('hidden');
       } else {
-        vrBtn.className = "flex-1 py-1.5 rounded-lg bg-amber-600 text-white transition-all text-center";
-        stdBtn.className = "flex-1 py-1.5 rounded-lg text-stone-600 hover:text-darkGreen transition-all text-center";
+        vrBtn.className = 'flex-1 py-1.5 rounded-lg bg-amber-600 text-white transition-all text-center';
+        stdBtn.className = 'flex-1 py-1.5 rounded-lg text-stone-600 hover:text-darkGreen transition-all text-center';
+
         vrView.classList.remove('hidden');
         stdView.classList.add('hidden');
       }
     }
 
-    function clearFog() {
-      const overlay = document.getElementById('fog-overlay');
-      overlay.classList.add('fog-clearing');
-      setTimeout(() => {
-        document.getElementById('progress-bar').style.width = '58%';
-        document.getElementById('progress-text').innerText = '58% (+16%)';
-      }, 500);
-    }
-
-    function filterRewards(category) {
-      document.querySelectorAll('.reward-tab-btn').forEach(btn => {
-        btn.className = "reward-tab-btn px-3 py-1 rounded-xl text-xs font-bold bg-white text-stone-600 border border-stone-200 transition shadow-xs whitespace-nowrap";
-      });
-      document.getElementById('tab-' + category).className = "reward-tab-btn px-3 py-1 rounded-xl text-xs font-bold bg-darkGreen text-white transition shadow-xs whitespace-nowrap";
-
-      document.querySelectorAll('.reward-card').forEach(card => {
-        if (category === 'all' || card.classList.contains(category)) {
-          card.classList.remove('hidden');
-        } else {
-          card.classList.add('hidden');
-        }
-      });
-    }
-
-    function unlockBuddy(name, icon, perk, cost, btnId) {
-      if (currentTokens >= cost) {
-        currentTokens -= cost;
-        updateAllTokenDisplays();
-
-        unlockedBuddies.push({ name, icon, perk });
-        renderBuddySelectionList();
-
-        const btn = document.getElementById(btnId);
-        btn.innerText = "✓ 已解鎖";
-        btn.disabled = true;
-        btn.className = "w-full py-1.5 bg-stone-300 text-stone-600 text-xs font-bold rounded-xl cursor-not-allowed";
-
-        showToast(`🎉 成功解鎖夥伴【${name}】！`);
-      } else {
-        showToast('⚠️ Token 餘額不足！請先完成任務。');
+    function redeemReward(title, cost) {
+      if (currentTokens < cost) {
+        showToast('⚠️ Token 餘額不足！請先完成打卡任務。');
+        return;
       }
-    }
 
-    function renderBuddySelectionList() {
-      const container = document.getElementById('buddy-selection-list');
-      container.innerHTML = unlockedBuddies.map(b => `
-        <button onclick="selectBuddy('${b.name}', '${b.icon}', '${b.perk}')" class="w-full p-2.5 bg-white hover:bg-amber-50 rounded-xl border border-stone-200 flex items-center gap-3 text-left transition shadow-xs">
-          <span class="text-3xl">${b.icon}</span>
-          <div>
-            <p class="font-extrabold text-xs text-stone-800">${b.name}</p>
-            <p class="text-[10px] text-amber-700 font-medium">特技: ${b.perk}</p>
-          </div>
-        </button>
-      `).join('');
-    }
+      currentTokens -= cost;
+      updateAllTokenDisplays();
 
-    function handleImageSelect(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          selectedImageBase64 = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
+      document.getElementById('qr-title').innerText = title;
+      openModal('modal-qr');
     }
 
     function submitMemory() {
-      const text = document.getElementById('memory-input').value.trim();
+      const input = document.getElementById('memory-input');
+      const text = input.value.trim();
+
       if (!text) {
         showToast('請先輸入感想或回憶內容');
         return;
@@ -1418,131 +1724,33 @@ GPS 偵測已抵達附近 (點擊完成探索)
       const feed = document.getElementById('memories-list');
       const data = landmarkDatabase[currentLandmarkIdx];
 
-      const newPostHtml = `
+      const html = `
         <div class="bg-cardBg p-3 rounded-2xl border border-stone-100 shadow-sm badge-pop">
           <div class="flex justify-between items-center mb-1.5">
             <div class="flex items-center gap-2">
               <span class="text-base">👧</span>
               <div>
-                <p class="text-xs font-bold text-stone-800">小林 (探索家)</p>
+                <p class="text-xs font-bold text-stone-800">小林</p>
                 <p class="text-[10px] text-stone-400">剛剛發佈</p>
               </div>
             </div>
-            <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md font-bold">✨ 最新感想與懷舊回憶</span>
+            <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md font-bold">✨ 最新感想</span>
           </div>
-          <p class="text-xs text-stone-700 leading-relaxed mb-2">${text}</p>
-          ${selectedImageBase64 ? `<img src="${selectedImageBase64}" class="w-full h-32 object-cover rounded-xl mb-2 border border-stone-200">` : ''}
+
+          <p class="text-xs text-stone-700 leading-relaxed mb-2">${escapeHtml(text)}</p>
+
           <div class="flex justify-between items-center text-[11px] text-stone-500 pt-1 border-t border-stone-100">
-            <button onclick="this.querySelector('span').innerText = parseInt(this.querySelector('span').innerText) + 1" class="hover:text-amber-600 flex items-center gap-1 font-semibold text-rose-500 bg-rose-50 px-2.5 py-0.5 rounded-full">
-              ❤️ <span>1</span>
-            </button>
+            <span>❤️ 1</span>
             <span>📍 ${data.name}</span>
           </div>
         </div>
       `;
 
-      feed.insertAdjacentHTML('afterbegin', newPostHtml);
-      document.getElementById('memory-input').value = '';
-      selectedImageBase64 = null;
+      feed.insertAdjacentHTML('afterbegin', html);
+      input.value = '';
+
       showToast('✨ 感想已成功發佈到社區記憶牆！');
     }
-
-    function redeemReward(title, cost) {
-      if (currentTokens >= cost) {
-        currentTokens -= cost;
-        updateAllTokenDisplays();
-        document.getElementById('qr-title').innerText = title;
-        document.getElementById('modal-qr').classList.remove('hidden');
-      } else {
-        showToast('⚠️ Token 餘額不足！請先完成打卡任務累積 Token。');
-      }
-    }
-
-    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-    function openAllBadgesModal() { openModal('modal-all-badges'); }
-    // Change avatar clothing
-const homeSceneState = {
-  avatar: 'C05EBBD8-F70B-41EE-A1EB-518C922E41C5.png',
-  background: 'IMG_3512.jpeg',
-  buddyIcon: '🐈'
-};
-
-function renderHomeScene() {
-  const background = document.getElementById('main-page-map-photo');
-  const avatar = document.getElementById('home-avatar');
-  const buddy = document.getElementById('home-walking-buddy');
-
-  if (background) background.src = homeSceneState.background;
-  if (avatar) avatar.src = homeSceneState.avatar;
-  if (buddy) buddy.innerText = homeSceneState.buddyIcon;
-}
-
-function changeHomeAvatar(imageFile) {
-  homeSceneState.avatar = imageFile;
-  renderHomeScene();
-  closeModal('modal-avatar-dressup');
-  showToast('✨ 角色服裝更換成功！');
-}
-
-function changeHomeBackground(imageFile) {
-  homeSceneState.background = imageFile;
-  renderHomeScene();
-  closeModal('modal-background');
-  showToast('🌅 背景更換成功！');
-}
-
-
-// Change background image
-function changeHomeBackground(imageFile) {
-
-  const background = document.getElementById('main-page-map-photo');
-
-  if (!background) return;
-
-  background.src = imageFile;
-
-  closeModal('modal-background');
-
-  showToast('🌅 背景更換成功！');
-}
-    function selectBuddy(fullName, icon, perk) {
-  homeSceneState.buddyIcon = icon;
-  renderHomeScene();
-
-  const badge = document.getElementById('home-buddy-icon-badge');
-  if (badge) badge.innerText = icon;
-
-  const buddyName = document.getElementById('buddy-name-display');
-  if (buddyName) buddyName.innerText = fullName;
-
-  const buddyIconDisplay = document.getElementById('buddy-icon-display');
-  if (buddyIconDisplay) buddyIconDisplay.innerText = icon;
-
-  const profileBadge = document.getElementById('profile-buddy-badge');
-  if (profileBadge) profileBadge.innerText = icon;
-
-  const perkDisplay = document.getElementById('buddy-perk-display');
-  if (perkDisplay) {
-    perkDisplay.innerText = `❤️❤️❤️🤍🤍 (${perk})`;
-  }
-
-  closeModal('modal-buddy');
-  showToast(`已切換夥伴為 ${fullName}`);
-}
-  document.getElementById('buddy-name-display').innerText = fullName;
-
-  document.getElementById('buddy-icon-display').innerText = icon;
-
-  document.getElementById('profile-buddy-badge').innerText = icon;
-
-  document.getElementById('buddy-perk-display').innerText =
-    `❤️❤️❤️🤍🤍 (${perk})`;
-
-  closeModal('modal-buddy');
-
-  showToast(`已切換夥伴為 ${fullName}`);
-}
 
     function equipTitle(title) {
       document.getElementById('profile-equipped-title').innerText = title;
@@ -1550,10 +1758,24 @@ function changeHomeBackground(imageFile) {
       showToast(`已佩戴稱號【${title}】`);
     }
 
-    window.onload = function() {
+    function escapeHtml(str) {
+      return str
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    window.onload = function () {
       switchPage('page-home');
       updateAllTokenDisplays();
+      renderHomeScene();
+      renderAvatarPreviews();
+      renderBuddySelectionList();
+      updateLocationCardUI();
     };
   </script>
+
 </body>
 </html>
