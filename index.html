@@ -170,10 +170,14 @@
 </div>
 </div>
 
-<!-- ★ 新增：選項列（按按鈕後在圖片下方展開） -->
-<div id="customize-panel" class="hidden mt-2 bg-white rounded-2xl border border-[#E2DAC4] p-2.5">
-<p id="customize-title" class="text-[11px] font-extrabold text-stone-600 mb-2"></p>
-<div id="customize-options" class="flex gap-2 overflow-x-auto no-scrollbar"></div>
+<div class="absolute inset-0 bg-black/60 backdrop-blur-xs z-40 hidden flex justify-center items-center p-4" id="modal-customize" onclick="if(event.target===this)closeModal('modal-customize')">
+<div class="bg-white rounded-3xl p-4 w-full max-w-sm shadow-2xl border-2 border-softGreen">
+<div class="flex items-center justify-between mb-3">
+<h3 id="customize-title" class="font-extrabold text-base text-stone-900"></h3>
+<button onclick="closeModal('modal-customize')" class="w-7 h-7 rounded-full bg-stone-100 text-stone-500 font-bold text-sm">✕</button>
+</div>
+<div id="customize-options" class="grid grid-cols-3 gap-2"></div>
+</div>
 </div>
 </div>
 <div class="bg-white rounded-3xl p-3.5 border-2 border-[#EBE3CE] shadow-xs space-y-2">
@@ -1332,21 +1336,9 @@ const avatarState = { clothing: 'default', partner: 'cat', background: 'forest' 
 let openedCustomize = null;
 
 function openCustomize(type) {
-  const panel = document.getElementById('customize-panel');
-  if (openedCustomize === type) {          // 再按同一粒 = 收起
-    openedCustomize = null;
-    panel.classList.add('hidden');
-  } else {
-    openedCustomize = type;
-    panel.classList.remove('hidden');
-    renderCustomizeOptions();
-  }
-  ['clothing', 'partner', 'background'].forEach(t => {
-    const on = t === openedCustomize;
-    const b = document.getElementById('cust-btn-' + t);
-    b.classList.toggle('ring-2', on);
-    b.classList.toggle('ring-amber-400', on);
-  });
+  openedCustomize = type;
+  renderCustomizeOptions();
+  openModal('modal-customize');
 }
 
 function renderCustomizeOptions() {
@@ -1355,9 +1347,9 @@ function renderCustomizeOptions() {
   document.getElementById('customize-options').innerHTML = cfg.items.map(it => {
     const active = avatarState[openedCustomize] === it.id;
     return `<button onclick="pickCustomize('${openedCustomize}','${it.id}')"
-      class="shrink-0 min-w-[64px] px-2.5 py-1.5 rounded-xl border-2 flex flex-col items-center gap-0.5 transition ${active ? 'border-amber-400 bg-amber-50' : 'border-stone-200 bg-stone-50'}">
-      <span class="text-xl leading-none">${it.icon}</span>
-      <span class="text-[10px] font-bold text-stone-700 whitespace-nowrap">${it.label}</span>
+      class="px-2 py-3 rounded-2xl border-2 flex flex-col items-center gap-1 transition ${active ? 'border-amber-400 bg-amber-50' : 'border-stone-200 bg-stone-50'}">
+      <span class="text-2xl leading-none">${it.icon}</span>
+      <span class="text-[11px] font-bold text-stone-700 text-center leading-tight">${it.label}</span>
     </button>`;
   }).join('');
 }
@@ -1365,11 +1357,11 @@ function renderCustomizeOptions() {
 function pickCustomize(type, id) {
   if (id === 'more') {
     showToast('🛍️ 更多服裝將會在商店推出，敬請期待！');
-    return;
+    return;                                  // 視窗保持開啟
   }
   avatarState[type] = id;
   if (type === 'partner') showToast('🐈 目前夥伴固定為貓咪');
-  renderCustomizeOptions();
+  closeModal('modal-customize');             // 選完自動關閉，才看到圖片更換
   applyHeroImage();
 }
 
