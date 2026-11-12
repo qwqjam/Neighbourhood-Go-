@@ -147,44 +147,58 @@
 </div>
 <!-- Reference Image Style Hand-Drawn Neighborhood Map Container -->
 <div class="relative rounded-3xl bg-[#F4EFE0] border-2 border-[#E2DAC4] p-2 overflow-hidden shadow-sm">
-<div class="relative h-72 w-full rounded-2xl bg-[#F7F4E9] overflow-hidden flex items-center justify-center">
-<!-- SVG Hand-drawn Styled Neighborhood Map matching reference image -->
-<!-- 圖片位置 1：首頁地圖相片。把圖片放在 HTML 同一個資料夾，然後把 src="main-page-map.jpg" 改成你的圖片檔案名稱。 --><img alt="首頁社區地圖相片" class="absolute inset-0 w-full h-full object-cover z-0" id="main-page-map-photo" onerror="this.style.display='none'" src="IMG_3512.jpeg"/><svg class="absolute inset-0 w-full h-full" fill="none" viewbox="0 0 350 290">
+<!-- Photo frame with buttons occupying part of its space -->
+<div class="relative h-72 w-full rounded-2xl
+            bg-[#F7F4E9] overflow-hidden flex">
 
-</svg>
-<!-- 圖片切換按鈕：浮動在圖片右上角 -->
-<div class="absolute top-3 right-3 z-20 flex flex-col gap-2">
+    <!-- PHOTO AREA: takes up remaining space -->
+    <div class="relative flex-1 min-w-0 overflow-hidden">
 
-    <button
-        onclick="changeBackground('IMG_3512.jpeg')"
-        class="px-3 py-2 rounded-lg bg-white/90 text-emerald-800 text-xs font-bold shadow">
-        🌅 背景
-    </button>
+        <img
+            id="main-page-map-photo"
+            alt="首頁社區地圖相片"
+            src="IMG_3512.jpeg"
+            class="absolute inset-0 w-full h-full object-cover"
+            onerror="this.style.display='none'"
+        />
 
-    <button
-        onclick="changeOutfit('C05EBBD8-F70B-41EE-A1EB-518C922E41C5.png')"
-        class="px-3 py-2 rounded-lg bg-white/90 text-amber-800 text-xs font-bold shadow">
-        👕 預設服裝
-    </button>
+        <!-- Keep your existing SVG and badges here -->
 
-    <button
-        onclick="changeOutfit('9A6E30B4-9BEA-4DD6-A1C7-F75E4F6B0A6F.png')"
-        class="px-3 py-2 rounded-lg bg-white/90 text-amber-800 text-xs font-bold shadow">
-        ❄️ 冬季服裝
-    </button>
+    </div>
 
-    <button
-        onclick="showComingSoon()"
-        class="px-3 py-2 rounded-lg bg-white/90 text-stone-700 text-xs font-bold shadow">
-        🛍️ 更多服裝
-    </button>
+    <!-- BUTTON PANEL: inside the same frame -->
+    <div class="w-24 shrink-0 bg-white/90
+                flex flex-col justify-center gap-2 p-2">
 
-    <button
-        onclick="showToast('🐱 已選擇貓咪夥伴！')"
-        class="px-3 py-2 rounded-lg bg-white/90 text-orange-800 text-xs font-bold shadow">
-        🐱 貓咪夥伴
-    </button>
+        <p class="text-xs font-bold text-center text-stone-700">
+            更換照片
+        </p>
 
+        <button onclick="changeMainPhoto('background1.jpeg')"
+            class="rounded-lg bg-emerald-100 text-emerald-800
+                   text-xs font-bold py-2">
+            背景 A
+        </button>
+
+        <button onclick="changeMainPhoto('background2.jpeg')"
+            class="rounded-lg bg-emerald-100 text-emerald-800
+                   text-xs font-bold py-2">
+            背景 B
+        </button>
+
+        <button onclick="changeMainPhoto('outfit1.jpeg')"
+            class="rounded-lg bg-orange-100 text-orange-800
+                   text-xs font-bold py-2">
+            裝扮 A
+        </button>
+
+        <button onclick="changeMainPhoto('outfit2.jpeg')"
+            class="rounded-lg bg-orange-100 text-orange-800
+                   text-xs font-bold py-2">
+            裝扮 B
+        </button>
+
+    </div>
 </div>
 <!-- Floating Token Badge (As in Reference Image photo bottom-left overlay) -->
 <div class="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md rounded-2xl px-3 py-1.5 shadow-md border border-stone-200 flex items-center gap-2">
@@ -1021,6 +1035,7 @@ GPS 偵測已抵達附近 (點擊完成探索)
 </button>
 </nav>
 </div>
+
 <script>
     // 圖片位置 5：地點推薦相片。修改每個地點資料內的 image: 圖片檔案名稱。
       // 例如 image: "kennedy-town.jpg"，並把圖片放在 HTML 同一個資料夾。
@@ -1062,6 +1077,14 @@ GPS 偵測已抵達附近 (點擊完成探索)
     ];
 
     let currentTokens = 260;
+    function changeMainPhoto(imagePath) {
+    const photo = document.getElementById('main-page-map-photo');
+
+    if (!photo) return;
+
+    photo.src = imagePath;
+    photo.style.display = 'block';
+}
     // ========================================
 // 共用圖片框架：背景及服裝都替換同一張照片
 // ========================================
